@@ -1,0 +1,13 @@
+# Metabolomics download manifest (fallback direct links)
+# ST000745 (CSF metabolomics study)
+https://www.metabolomicsworkbench.org/studydownload/ST000745.zip
+https://www.metabolomicsworkbench.org/studydownload/ST000745_AN001167_Results.txt
+https://www.metabolomicsworkbench.org/studydownload/ST000745_AN001168_Results.txt
+
+# ST001104 (Ballester et al. 2018)
+https://www.metabolomicsworkbench.org/studydownload/ST001104.zip
+https://www.metabolomicsworkbench.org/studydownload/ST001104_AN001797_Results.txt
+
+# ST002921 (Jang et al. 2025 NTM CSF)
+https://www.metabolomicsworkbench.org/studydownload/ST002921_NTM_Rawdata.zip
+https://www.metabolomicsworkbench.org/studydownload/ST002921_AN004791_Results.txt

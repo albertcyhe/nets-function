@@ -1,0 +1,120 @@
+# ---- OS / 编辑器杂项 ----
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.vscode/
+.idea/
+.ipynb_checkpoints/
+
+# ---- Python / R 环境 ----
+venv/
+.env/
+.venv/
+__pycache__/
+*.pyc
+.Rproj.user/
+.Rhistory
+.RData
+.packrat/
+renv/
+*.Rproj
+
+# ---- 常见大文件 / 压缩包 ----
+*.zip
+*.7z
+*.rar
+*.tar
+*.tar.gz
+*.tgz
+*.tar.zst
+*.zst
+*.gz
+*.bz2
+*.xz
+
+# ---- 生信原始数据（务必忽略）----
+# 测序原始/中间件
+*.fastq
+*.fastq.gz
+*.fq
+*.fq.gz
+*.bam
+*.bam.bai
+*.bai
+*.sam
+*.cram
+*.cram.crai
+*.vcf
+*.vcf.gz
+*.vcf.gz.tbi
+*.bed
+*.bed.gz
+*.bedGraph
+*.gtf
+*.gff
+*.gff3
+*.fa
+*.fasta
+*.fna
+*.fa.gz
+*.fasta.gz
+*.fa.fai
+*.idx
+*.bt2
+*.bt2l
+
+# 单细胞/矩阵类
+*.mtx
+*.mtx.gz
+barcodes.tsv
+barcodes.tsv.gz
+features.tsv
+features.tsv.gz
+genes.tsv
+genes.tsv.gz
+matrix.mtx
+matrix.mtx.gz
+*.loom
+*.h5
+*.h5ad
+*.rds
+*.rda
+*.rdata
+*.seurat
+*.anndata
+
+# ---- GEO / ArrayExpress 常见包 ----
+# 你截图里的这些：
+GSE*_RAW.tar
+*_series_matrix.txt.gz
+GPL*.annot.gz
+# 其他常见补充件（常很大）
+*_supp*.zip
+*_supp*.tar*
+*_LogNormalized_Data.csv.gz
+*_Cell_Types_Annotations.csv.gz
+
+# ---- 压缩的表格/数据 ----
+*.csv.gz
+*.tsv.gz
+*.txt.gz
+
+# ---- 大表格（可视自己情况保留/忽略）----
+*.xlsx
+*.xls
+*.parquet
+*.feather
+
+# ---- 结果输出、临时目录（可按项目改名）----
+/data/
+/raw/
+/inputs/
+/outputs/
+/results/
+/cache/
+/tmp/
+/logs/
+
+# 如果你想提交目录结构而不提交内容，可在这些目录里放 .gitkeep
+

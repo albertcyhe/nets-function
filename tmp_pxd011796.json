@@ -1,0 +1,164 @@
+{
+  "accession" : "PXD011796",
+  "title" : "Proteomic analysis of neutrophil extracellular traps (healthy control, rheumatoid arthritis, systemic lupus erythematosus)_C4PR_LIV",
+  "additionalAttributes" : [ ],
+  "projectDescription" : "Neutrophil Extracellular Traps (NETs) are chromatin-derived extracellular structures that are expelled from neutrophils in response to infectious or inflammatory stimuli. NET DNA structures are decorated with proteins including histones, myeloperoxidase and neutrophil elastase. NETs are implicated in the development of auto-immunity in diseases including rheumatoid arthritis (RA) and systemic lupus erythematosus (SLE) through the externalisation of intracellular neoepitopes e.g. dsDNA and nuclear proteins in SLE and citrullinated peptides in RA. The aim of this work was to use quantitative proteomics to identify and measure NET proteins produced by neutrophils from healthy individuals, and from patients with RA and SLE.",
+  "sampleProcessingProtocol" : "Ultra-pure neutrophils (>99%) from healthy individuals (n=3) and patients with RA or SLE (n=6 each) were incubated ±PMA (50nM, Protein Kinase C super-activator) or A23187 (3.8μM, calcium ionophore activator of peptidyl-arginine deiminase-4 (PAD4)) for 4h. Following two wash steps, NETs were liberated by nuclease digestion. NET proteins were concentrated onto Strataclean beads and digested on-bead with trypsin. Peptides were resolved on 1h gradients. Data-dependent LC-MS/MS analyses were conducted on a QExactive HF quadrupole-Orbitrap mass spectrometer.",
+  "dataProcessingProtocol" : "Label-free quantitative analysis was performed using Progenesis QI for proteomics. Exported peak lists were searched in Mascot against the UniProt Human reviewed database using a peptide mass tolerance of 10ppm and fragment ion mass tolerance of 0.01Da.Fixed modifications included carbamidomethyl cysteine and variable modifications oxidation of methionine. A peptide false discovery rate of 1% was set in Mascot before re-importing into Progenesis.",
+  "projectTags" : [ ],
+  "keywords" : [ "A23187", "Neutrophil extracellular traps", "Pma", "Rheumatoid arthritis", "Systemic lupus erythematosus" ],
+  "doi" : "10.6019/PXD011796",
+  "submissionType" : "COMPLETE",
+  "license" : "Creative Commons Public Domain (CC0)",
+  "submissionDate" : "2018-11-22",
+  "publicationDate" : "2019-02-18",
+  "submitters" : [ {
+    "title" : "Dr",
+    "firstName" : "Deborah",
+    "lastName" : "Simpson",
+    "identifier" : "111980179",
+    "affiliation" : "University of Liverpool",
+    "email" : "dsimpson@liverpool.ac.uk",
+    "country" : "United Kingdom",
+    "orcid" : "0000-0002-3962-4895",
+    "name" : "Deborah Simpson",
+    "id" : "111980179"
+  } ],
+  "labPIs" : [ {
+    "title" : "Dr",
+    "firstName" : "Dr Helen L",
+    "lastName" : "Wright",
+    "identifier" : "123840100",
+    "affiliation" : "Arthritis Research UK Career Development Fellow Institute of Aging and Chronic Disease University of Liverpool",
+    "email" : "hlwright@liverpool.ac.uk",
+    "country" : "",
+    "orcid" : "",
+    "name" : "Dr Helen L Wright",
+    "id" : "123840100"
+  } ],
+  "instruments" : [ {
+    "@type" : "CvParam",
+    "cvLabel" : "MS",
+    "accession" : "MS:1001911",
+    "name" : "Q Exactive"
+  } ],
+  "softwares" : [ {
+    "@type" : "CvParam",
+    "cvLabel" : "MS",
+    "accession" : "MS:1000531",
+    "name" : "Mascot Server 2.6.0"
+  }, {
+    "@type" : "CvParam",
+    "cvLabel" : "MS",
+    "accession" : "MS:1000531",
+    "name" : "Mascot Server 2.6.2"
+  }, {
+    "@type" : "CvParam",
+    "cvLabel" : "MS",
+    "accession" : "MS:1000531",
+    "name" : "Mascot Parser 2.6.2.0"
+  } ],
+  "experimentTypes" : [ {
+    "@type" : "CvParam",
+    "cvLabel" : "PRIDE",
+    "accession" : "PRIDE:0000429",
+    "name" : "Shotgun proteomics"
+  } ],
+  "quantificationMethods" : [ {
+    "@type" : "CvParam",
+    "cvLabel" : "PRIDE",
+    "accession" : "PRIDE:0000323",
+    "name" : "TIC"
+  } ],
+  "countries" : [ "United Kingdom" ],
+  "sampleAttributes" : [ {
+    "@type" : "Tuple",
+    "key" : {
+      "cvLabel" : "EFO",
+      "accession" : "EFO:0000635",
+      "name" : "organism part"
+    },
+    "value" : [ {
+      "cvLabel" : "BTO",
+      "accession" : "BTO:0000089",
+      "name" : "blood"
+    }, {
+      "cvLabel" : "CL",
+      "accession" : "CL:0000775",
+      "name" : "neutrophil"
+    } ]
+  }, {
+    "@type" : "Tuple",
+    "key" : {
+      "cvLabel" : "EFO",
+      "accession" : "OBI:0100026",
+      "name" : "organism"
+    },
+    "value" : [ {
+      "cvLabel" : "NEWT",
+      "accession" : "9606",
+      "name" : "Homo sapiens (Human)"
+    } ]
+  }, {
+    "@type" : "Tuple",
+    "key" : {
+      "cvLabel" : "EFO",
+      "accession" : "EFO:0000408",
+      "name" : "disease"
+    },
+    "value" : [ {
+      "cvLabel" : "DOID",
+      "accession" : "DOID:9074",
+      "name" : "systemic lupus erythematosus"
+    }, {
+      "cvLabel" : "DOID",
+      "accession" : "DOID:7148",
+      "name" : "rheumatoid arthritis"
+    } ]
+  } ],
+  "organisms" : [ {
+    "@type" : "CvParam",
+    "cvLabel" : "NEWT",
+    "accession" : "9606",
+    "name" : "Homo sapiens (human)"
+  } ],
+  "organismParts" : [ {
+    "@type" : "CvParam",
+    "cvLabel" : "BTO",
+    "accession" : "BTO:0000089",
+    "name" : "Blood"
+  }, {
+    "@type" : "CvParam",
+    "cvLabel" : "CL",
+    "accession" : "CL:0000775",
+    "name" : "Neutrophil"
+  } ],
+  "diseases" : [ {
+    "@type" : "CvParam",
+    "cvLabel" : "DOID",
+    "accession" : "DOID:7148",
+    "name" : "Rheumatoid arthritis"
+  }, {
+    "@type" : "CvParam",
+    "cvLabel" : "DOID",
+    "accession" : "DOID:9074",
+    "name" : "Systemic lupus erythematosus"
+  } ],
+  "references" : [ {
+    "referenceLine" : "Chapman EA, Lyon M, Simpson D, Mason D, Beynon RJ, Moots RJ, Wright HL. Caught in a Trap? Proteomic Analysis of Neutrophil Extracellular Traps in Rheumatoid Arthritis and Systemic Lupus Erythematosus. Front Immunol. 2019 10:423",
+    "pubmedID" : 30915077,
+    "doi" : "10.3389/fimmu.2019.00423"
+  } ],
+  "identifiedPTMStrings" : [ {
+    "@type" : "CvParam",
+    "cvLabel" : "UNIMOD",
+    "accession" : "UNIMOD:4",
+    "name" : "Carbamidomethyl"
+  }, {
+    "@type" : "CvParam",
+    "cvLabel" : "UNIMOD",
+    "accession" : "UNIMOD:35",
+    "name" : "Oxidation"
+  } ],
+  "totalFileDownloads" : 3938
+}
