@@ -13,6 +13,8 @@ venv/
 .venv/
 __pycache__/
 *.pyc
+.mamba/
+env/.mamba/
 .Rproj.user/
 .Rhistory
 .RData
@@ -118,3 +120,5 @@ GPL*.annot.gz
 
 # 如果你想提交目录结构而不提交内容，可在这些目录里放 .gitkeep
 
+# Utility scripts
+scripts/sh/msfragger_smoke.sh

@@ -1,0 +1,11 @@
+Gene	TotalPeptides	UniquePeptides	TotalSpectra	Rationale
+MPO	31	27	61	Canonical NET granular peroxidase; robust brain-metastatic NET effector
+ELANE	5	5	8	Serine protease driving ECM cleavage; signature NET-F effector
+PRTN3	2	2	4	Serine protease co-packaged with ELANE; helps degrade matrix
+CTSG	13	13	23	Granule serine protease; complements ELANE/PRTN3 activity
+AZU1	5	5	9	Heparin-binding granular protein; promotes vascular adhesion
+LTF	51	51	210	Iron-binding NET effector supporting microbial control and ECM interactions
+LCN2	9	9	15	Stabilises NET matrix & iron sequestration; persists extracellularly
+RNASE3	5	5	5	Eosinophil-derived cationic protein present in NETs; cytotoxic
+S100A8	8	8	13	Calprotectin component, immunomodulatory; maintains NET antimicrobial function
+S100A9	7	7	14	Partner of S100A8; extracellular persistence signals chronic NET presence

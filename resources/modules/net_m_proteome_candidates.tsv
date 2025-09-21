@@ -1,0 +1,11 @@
+Gene	TotalPeptides	UniquePeptides	TotalSpectra	Rationale
+PADI4	7	6	8	Citrullination enzyme required for chromatin decondensation; NET-M anchor
+H3C1	6	0	10	Histone H3 citrullination target; marks sustained NET chromatin
+H2BC12	5	0	27	Histone H2B variant enriched in NET chromatin cores
+H2BC11	6	0	27	Histone H2B variant; abundant in NET scaffold
+H1-5	8	7	10	Linker histone; proteolysis state reflects NET maturation
+H1-3	8	1	8	Linker histone variant recovered from NET remnants
+H1-4	8	1	8	Linker histone; supports DNA scaffold stability
+ANXA1	11	11	14	Annexin A1; PADI4-regulated, persists on NET membranes
+HMGB2	7	7	11	High mobility group protein; chromatin-bound NET marker
+VIM	28	23	35	Vimentin; citrullination-dependent NET scaffold component

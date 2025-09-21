@@ -1,0 +1,27 @@
+name: proteomics
+channels:
+  - bioconda
+  - conda-forge
+dependencies:
+  - python=3.10
+  - pip
+  - cython
+  - numpy
+  - scipy
+  - pandas
+  - matplotlib
+  - seaborn
+  - statsmodels
+  - pyteomics
+  - pymzml
+  - proteowizard
+  - msfragger
+  - pyopenms
+  - openjdk=17
+  - r-base=4.3
+  - bioconductor-msqrob2
+  - rpy2
+  - jq
+  - yq
+  - pybigwig
+  - gffread
