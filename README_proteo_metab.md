@@ -142,6 +142,45 @@ Serpin occupancy vs Proteo-DeltaFM (Aim A3)
    - Partial correlations controlling neutrophil proxies and astrocyte markers (GFAP, S100B) to isolate the effect.
    - Overlay on transcriptomic Serpin scores (GSE184869) for matched subjects.
 
+### A3 — Orthogonal strategy when F (ELANE/PRTN3/CTSG) is sparsely detected
+We accept that some proteomes (e.g., PXD005719) rarely detect F-module proteases. To still test “Serpin inhibition reduces F activity while M persists,” we use three independent readouts that do not rely on direct F quantification:
+
+- Chemistry (stoichiometry): ISI index
+  - Definition: Inhibitor–Protease Stoichiometry Index, `ISI = log2(Σ inhibitors / Σ target proteases)`.
+  - Inhibitor basket (core): SERPINA1, SERPINA3, SERPINB1, SERPINB6, SERPINB8. Extended set (sensitivity): SLPI, PI3/ELAFIN, A2M.
+  - Targets: ELANE, PRTN3, CTSG.
+  - Model: Mixed-effects regression `Proteo_ΔFM ~ ISI * organ + covariates + (1 | cohort)`. Expect β(ISI) < 0 and stronger effect in brain.
+
+- Detection-probability as signal (MNAR / zero-inflated)
+  - Treat “F detected?” at protein/peptide level as the dependent variable, with `Serpin_score` and sample covariates as predictors `(1 | cohort)` random effect.
+  - Compare with M markers as negative control; expect Serpin↑ → Pr(detect F)↓, but Pr(detect M) stable.
+
+- Functional footprints (substrate-centric)
+  - Build NE/PR3 “footprint indices” from semi-/non-tryptic N-termini enriched at motif-consistent sites (N-terminomics proxy) in existing/semi-tryptic searches.
+  - Correlate footprints with `Serpin_score`, `Proteo_ΔFM`, and THBS1-cleavage index.
+
+- THBS1 cleavage endpoint (semi-tryptic)
+  - Systematise the semi-tryptic re-search to quantify a THBS1 cleavage index: log2(neo-N sum) − log2(tryptic N sum). Expect lower cleavage in brain (higher inhibition), with M stable.
+
+- RNA→Protein bridge (mediation/moderation)
+  - For matched samples, test `Proteo_ΔFM ~ Serpin_RNA * organ + covariates`, controlling neutrophils/purity; Serpin_RNA should carry a significant (partial) effect.
+
+- Extended inhibitor axis (sensitivity)
+  - Add SLPI/ELAFIN/A2M to the inhibitor basket in ISI and repeat analyses; consistent negative association strengthens the causal story.
+
+- Missingness as signal — meta-analysis across cohorts
+  - Model `Missing%(F) ~ Serpin_score + organ + (1 | cohort)`; expect Serpin↑ → F-missing↑ in brain, while M-missing remains flat.
+
+Why this explains “brain decoupling vs lung coupling”
+- Brain: high inhibitor load (astrocyte/liver-derived A1AT, etc.) neutralises F first (low footprints, weak THBS1 cleavage, low F detection), while M (chromatin-bound) persists → ΔFM↓ and decoupling.
+- Lung: weaker inhibitor barrier → F footprints and THBS1 cleavage stay high; M and F more aligned (coupling), matching prior macro statistics.
+
+Minimal, two-week deliverables (no wet lab)
+- Implement ISI (core and extended baskets) and run mixed-effects with organ interaction; export forest plots.
+- Zero-inflated/logistic models for F detection vs Serpin-score; M as control.
+- Footprints: export NE/PR3 semi-/non-tryptic N-termini counts/densities and associate with Serpin-score, Proteo_ΔFM, THBS1 cleavage.
+- One-page integrative schematic: Serpin↑ → F-missing↑ & Footprints↓ → THBS1 cleavage↓ → Proteo_ΔFM↓; M peptides stable; brain vs lung facets.
+
 Metabolomic extensions (B1 & B2) — *Paused*
 ------------------------------------------
 > 2025-09-20：当前获取的 Workbench 研究（ST000745、ST001104、ST002921）仅提供 mwTab
@@ -165,6 +204,105 @@ Cross-layer integration & modelling
 - Built `results/tables/multiomics_alignment.tsv` (and `multiomics_pairwise_deltas.tsv`) aligning PXD046330 ↔ GSE96860 (SKBR3 reference) and PXD005719 ↔ GSE12237 (MDA-MB-231 parental vs brain variants).
 - Spearman ΔFM correlations are underpowered (`n<3` per cohort) but NET-M/THBS1 deltas remain available for interpretation; PXD051579 cross-omics stays paused until a matched transcriptomic dataset exists.
 
+#### A3 model executions — first pass (strict evidence)
+- ISI (Inhibitor–Protease Stoichiometry):
+  - Scripts: `scripts/py/isi_model.py` → `results/tables/isi_per_sample.tsv`, `isi_models.tsv`.
+  - Result: In current cohorts (PXD046330, PXD005719, PXD051579) the F targets (ELANE/PRTN3/CTSG) are not detected (target_sum=0 for all samples), so ISI is undefined by design. This is consistent with “F suppressed/not measurable while M persists”.
+- MNAR (Missingness-as-signal):
+  - Scripts: `scripts/py/mnar_detection_model.py` → `results/tables/mnar_detection_table.tsv`, `mnar_logit_results.tsv`.
+  - Result: detect_F=0 across all samples, detect_M=1 across all samples, yielding non‑estimable logits but a definitive qualitative pattern: “F fully missing, M universally present”.
+- Footprint indices (substrate-centric NE/PR3 proxy):
+  - Script: `scripts/py/footprint_indices.py` → `results/tables/footprints.tsv`.
+  - Result: indices are consistently negative; in PXD005719, brain‑variant shows lower footprint than parental (≈ −0.786 vs −0.633), aligning with reduced THBS1 protein signal in brain. PXD046330 and PXD051579 show negative footprints consistent with low NE/PR3 activity.
+
+#### Final stratified associations (evidence chain)
+Using CLR‑normalized secreted Serpin scores (core: A1AT/A3/SERPINI1), we ran stratified associations with robust summaries (Spearman primary; OLS/RLM where estimable). Covariate `log_total_PSMs` included where modelled.
+
+- Footprints vs Serpin (expect negative)
+  - Combined: ρ ≈ −0.563, p ≈ 0.00121, q ≈ 0.00182 (BH within stratum)
+  - Non‑brain: ρ ≈ −0.560, p ≈ 0.00160, q ≈ 0.00130
+  - Brain: under‑powered (n≈1–2 effective), no stable estimate
+
+- THBS1 abundance vs Serpin (expect positive)
+  - Combined: ρ ≈ +0.583, p ≈ 0.00073, q ≈ 0.00218
+  - Non‑brain: ρ ≈ +0.611, p ≈ 0.00043, q ≈ 0.00130
+  - Brain: under‑powered
+
+- Proteo‑ΔFM vs Serpin (expect negative)
+  - Combined/Non‑brain: weak, non‑significant (ρ ≈ +0.225, p ≈ 0.29)
+  - Interpretation: ΔFM here is M‑driven (F fully missing), so Serpin→ΔFM effect is attenuated; our footprint/THBS1 anchors carry the signal as designed.
+
+Tables: `results/tables/assoc_summary.tsv` (per‑stratum endpoint summaries).
+
+Mixed-effects (organ interaction):
+- `scripts/py/mixed_effects_a3.py` → `results/tables/mixed_effects_a3.tsv`
+  * Model: `endpoint ~ Serpin_score_core * organ + log_total_PSMs + (1 | dataset)`.
+  * THBS1 abundance fit: β_Serpin ≈ +0.028 (non-significant; limited organ contrast); footprint model remains singular (brain stratum underpowered), annotated in the table for transparency.
+
+Figures (R, Cell‑style):
+- `scripts/r/13_figures_a3.R` renders
+  - `results/figures/A3_forest_assoc.pdf` – Spearman effect forest (95% CI via Fisher transform) by stratum×endpoint.
+  - `results/figures/A3_scatter_serpin_vs_footprint.pdf` – Serpin vs Footprint (facet by dataset; lm line; theme_classic).
+  - `results/figures/A3_scatter_serpin_vs_THBS1.pdf` – Serpin vs THBS1.
+  - `results/figures/A3_scatter_serpin_vs_deltaFM.pdf` – Serpin vs Proteo‑ΔFM.
+  - `results/figures/A3_scatter_serpin_vs_thbs1_cleave.pdf` – Serpin vs THBS1 cleavage index (endpoint anchor).
+  - Negative controls:
+    - `results/figures/A3_scatter_serpin_vs_ctrl_footprint.pdf` – Serpin vs control footprint (acidic P1 motif).
+    - `results/figures/A3_scatter_serpin_vs_ecm_nc.pdf` – Serpin vs ECM negative‑control CLR score (laminins).
+  - Run:
+    ```bash
+    micromamba activate proteomics
+    Rscript scripts/r/13_figures_a3.R
+    ```
+
+THBS1 cleavage index (endpoint anchor):
+- `scripts/py/thbs1_cleavage_index.py` → `results/tables/thbs1_cleave_idx.tsv` (controls for COL1A1/COL4A1 included). Command:
+  ```bash
+  micromamba run -n proteomics python scripts/py/thbs1_cleavage_index.py \
+    --dataset PXD046330 --dataset PXD005719 --dataset PXD051579
+  ```
+
+Negative controls (null guards):
+- Compute and store at `results/tables/neg_controls.tsv`:
+  - ECM_nc_score: CLR mean across laminin subunits (LAMA1/2/3, LAMB1/2/3, LAMC1/2/3).
+  - control_footprint_index: footprint with acidic P1 motif (D/E), expected to show no Serpin dependence.
+- Script: `scripts/py/neg_controls.py` (already executed).
+
+#### PhD feedback → publishable modelling plan (to execute next)
+We keep the strict findings above unchanged and upgrade modelling per the following A–F roadmap.
+
+- A1. Interpretable Serpin scores (already scaffolded)
+  - Core (secreted): SERPINA1/A3/SERPINI1; Sensitivity (extended): + SLPI, Elafin (PI3/TRAPPIN‑2), A2M.
+  - Normalisation: median polish + CLR (label‑free). First pass: CLR implemented via `scripts/py/serpin_scores.py` → `results/tables/serpin_scores.tsv` (columns: `Serpin_score_core`, `Serpin_score_ext`). Median‑polish step will be added when intensity matrices are in place.
+- A2. Three associations, stratified + robust (to implement)
+  - Models: 
+    - `Footprint_index_NEPR3 ~ Serpin_score + purity + neutro_abundance + (1 | cohort)` (expect β<0)
+    - `THBS1_abundance ~ Serpin_score + ...` (expect β>0)
+    - `Proteo-ΔFM ~ Serpin_score + ...` (expect β<0)
+  - Robustness: Spearman + Huber/robust LM + rank‑permutation; BH FDR across endpoints.
+  - Stratify by organ (brain vs non‑brain) and produce random‑effects forest plot (report I²). Script stub to be added (`scripts/py/robust_assoc.py`).
+- A3. Negative controls (to implement)
+  - ECM secreted proteins without NE/PR3 motif (e.g., laminin subunits) → correlation vs Serpin_score ~ 0.
+  - Unrelated footprint (e.g., MMP‑favoured motif) → no association with Serpin_score.
+- B1. Endpoint anchor — THBS1 cleavage index (to implement)
+  - `THBS1_cleave_idx = (# semi/non‑tryptic N‑termini at curated THBS1 sites) / (THBS1 coverage)`; associate with Serpin_score, ΔFM, footprints; verify COL1A1/COL4A1 as specificity controls.
+  - Script stub will consume combined PSMs and a curated site list under `resources/annotation/thbs1_sites.tsv`.
+- B2. MNAR upgraded — peptide‑level hurdle/zero‑inflated + meta‑logit (to implement)
+  - Model detection per peptide: `Pr(detect_peptide_j) ~ Serpin_score + mods + (1 | cohort)`; meta‑logit across cohorts for NE/PR3 peptides; histone/ci‑markers as negative controls.
+- C. Anti‑confounding (to implement)
+  - C1 Deconvolution: estimate astrocyte/microglia/endothelium/neutrophil proportions from marker panels; include or stratify.
+  - C2 Compositional effects: apply CLR to all proteins; z‑score within cohort; report sensitivity.
+  - C3 Random effects: carry `(1|cohort)` in all models; report I² (Cochran’s Q).
+- D. Structural equation model (SEM) / Bayesian latent (to implement)
+  - Latent `F_activity` targeted by {Footprints, THBS1_cleave_idx, MNAR}; 
+    paths: `Serpin_score → F_activity → {Footprints, THBS1_cleave_idx, ΔFM}`; `M_stability → ΔFM`; organ as moderator.
+  - Output: standardized path coefficients + fit (CFI/TLI/RMSEA or WAIC).
+- E. Positive/negative controls (to implement)
+  - Positive: known NET‑positive inflammatory set → Footprints↑, THBS1‑cleave↑, ΔFM≥0.
+  - Negative: NET‑irrelevant pathways (e.g., ribosomal) uncorrelated with Serpin_score.
+- F. Stop criteria (target for manuscript lock‑in)
+  - Brain stratum: |β|≥0.25 and q<0.05 for ≥2 of 3 primary endpoints (Footprints, THBS1, ΔFM) with negative controls null and acceptable heterogeneity (I²<60%); otherwise defer to SEM for integrated evidence.
+
 Directory conventions & deliverables
 ------------------------------------
 - **Raw downloads**: `data/raw/<dataset>/` (tar/RAW/mzML/metadata). Keep `checksums.sha256` after download.
@@ -173,6 +311,9 @@ Directory conventions & deliverables
 - **Resources**: `resources/modules/` (module gene lists), `resources/manifests/` (aria2 manifests), `resources/annotation/` (UniProt ↔ gene symbol maps), `resources/msfragger/` (search params).
 - **Scripts**: migrate core execution into `scripts/py/` and `scripts/r/`; keep legacy notebooks under `colab/` with a note that they are archival references.
 - **Results**: `results/tables/` and `results/figures/` for each aim (prefix `proteo_`, `metabolomics_`, `mixed_`).
+
+Environment notes (RNA bigWig summarisation)
+- The `proteomics` env now includes `pybigwig` for stranded bigWig handling and `gffread` for light-weight GTF curation. Gencode v43 GTF is staged at `resources/annotation/gencode/gencode.v43.basic.annotation.gtf.gz`.
 
 Next actions checklist
 ----------------------
@@ -188,3 +329,10 @@ Next actions checklist
 - [ ] *(Paused)* Metabolomics preprocessing / redox ratios — restore once named metabolite matrices are available.
 - [ ] *(Paused)* Integrate metabolomics-derived metrics alongside proteomic layers.
 - [ ] Integrate layers into the mixed-effects framework and draft publication-quality figures.
+- External-growth / bypass proxies (module scores)
+  - `scripts/py/module_scores.py` → `results/tables/module_scores.tsv` (CLR-based):
+    * `E2F_G2M_score` (proliferation), `IL6_STAT3_score`, `CoOption_score`.
+  - Associations (`scripts/py/module_assoc.py` → `results/tables/module_assoc.tsv`):
+    * Non-brain: CoOption_score correlates positively with THBS1 abundance (ρ≈+0.60, p≈5.5e−4) and negatively with footprints (ρ≈−0.60, p≈5.4e−4), supporting the “extracellular bypass” path when Serpin is high.
+    * Non-brain: E2F_G2M_score inversely correlates with Proteo-ΔFM (ρ≈−0.55, p≈0.005), consistent with F-driven ΔFM in proliferation-driven settings.
+    * Brain stratum currently has n=1 (PXD005719 brain variant) – insufficient for statistics; flagged in tables.

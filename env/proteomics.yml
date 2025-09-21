@@ -19,6 +19,15 @@ dependencies:
   - pyopenms
   - openjdk=17
   - r-base=4.3
+  - r-ggplot2
+  - r-cowplot
+  - r-dplyr
+  - r-readr
+  - r-tidyr
+  - r-ggrepel
+  - r-ggpubr
+  - r-scales
+  - r-broom
   - bioconductor-msqrob2
   - rpy2
   - jq
