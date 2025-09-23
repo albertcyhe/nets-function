@@ -1,286 +1,267 @@
-NET‑F vs NET‑M（ΔFM）脑转移特异性失衡：从假设到推论（含可复现指引）
+# NET 标记与功能解耦在脑转移中的证据链（含可复现记录）
 
-假设（Hypothesis）
-- 我们提出 ΔFM = z(F) − z(M) 作为量化 NETs“功能（F）/标记（M）”失衡的指标，其中：
-  - NET‑F：功能端，选用 ELANE/PRTN3/CTSG（避免上游 NOX 等产生 ROS 的组件混入）。
-  - NET‑M：标记端，以 PADI4 为锚，并在中性粒富集样本中做共表达扩展（v2，互斥于 F）。
-- 预期：ΔFM 低（F<M）不是普遍存在，而是“脑转移微环境”的特异性状态，并与 THBS1/ECM/血管生成等外生长相关轴耦合。
+本 README 以“研究思路 → 执行 → 结果”的顺序，重构并整合先前在 RNA 与 Proteomics/Metabolomics 层完成的全部工作与产出（含失败与修正）。
 
-设计（Design）
-- Bulk（主验证）：
-  - 配对转移（优先）：GSE184869（RNA‑seq，已提供 log2 TMM CPM）、GSE125989（Affy GPL571）。
-  - 转移灶（脑/非脑）：GSE43837（脑），GSE14017/14018。
-  - 协变量：中性粒浸润（MCPcounter）、肿瘤纯度（tidyestimate/ESTIMATEScore→TumorPurity），批次/平台分层；不跨平台混合。
-  - 评分法：singscore 与 ssGSEA（GSVA 2.2 新 API，param 模式；对重复行名按“列最大值”聚合，避免行名冲突），ΔFM 统一按样本内 z 标准化后计算。
-- scRNA（机制承载）：
-  - GSE186344 多肿瘤脑转移单细胞，使用 10x 原始计数（.h5/.h5.gz、或 mtx 三件套；优先 h5）。
-  - 中性粒严格门控（高 NEUT ≥ q，低 TNK/Mono ≤ 60% 分位），在中性粒内计算 ΔFM.cell 并聚类锁定“低ΔFM”亚群，输出样本层比例；
-  - 肿瘤like（EPCAM/KRT*）细胞内计算 THBS1 中位量，与“低ΔFM 中性粒亚群比例”做样本层相关。
+## 1. 研究动机与假设（标记≠功能，可否解耦？）
 
-验证（Validation）
-- ΔFM 配对差异（met−primary）：
-  - GSE184869（RNA‑seq）：singscore Wilcoxon V=14, p=2.10e−4, FDR=3.22e−4，Cliff’s δ≈−0.70，n=20；ssGSEA 方向与显著性一致。
-  - GSE125989（Affy）：V=91, p=0.252, FDR=0.298，Cliff’s δ≈0.25，n=16（不显著）。
-  - 图：results/figures/Figure2_GSE184869_Paired_DFM.pdf（含 GSE125989）。*（2025-09-21：重新跑脚本刷新。）*
-  - 表：results/tables/GSE184869_paired_tests.tsv、results/tables/GSE125989_paired_tests.tsv（Wilcoxon + Cliff’s δ）。
-- ΔFM 与 THBS1 偏相关（控制 Neutrophil + TumorPurity）：
-  - GSE184869：singscore ρ=−0.3004, p=0.00415, FDR≈0.00831, n=90；ssGSEA ρ=−0.2732, p=0.00936, FDR≈0.00936，方向一致。
-  - GSE125989：ρ=0.2269, p=0.2109, FDR≈0.3149, n=32（不显著）。
-  - 图：results/figures/Figure3_GSE184869_THBS1_Residuals.pdf（残差散点，ΔFM 与 THBS1 均残差化后相关）。
-  - 表：results/tables/GSE184869_THBS1_residuals.tsv（Spearman ρ、p、n；偏相关备份保留在 `results/tables/GSE184869_thbs1_partial_cor.tsv`）。
-- F/M 相关性（Spearman）跨队列总览（5 队列 × 2 方法）：
-  - GSE184869：singscore ρ=−0.2081, p=0.0491, FDR=0.098；ssGSEA ρ=−0.1216, p=0.2537。
-  - GSE125989：ρ=0.4941, p=0.00449, FDR=0.01495；ssGSEA ρ=0.4025, p=0.02314。
-  - GSE43837：ρ≈0.07–0.11，p>0.5；GSE14017：ρ≈0.23–0.26，p>0.18；GSE14018：ρ≈0.65–0.67，p≪0.001。
-  - 图：results/figures/Figure4_FM_Corr_Overview.pdf；数据：results/tables/fm_correlation_overview.tsv。*（2025-09-21：`scripts/r/06_fm_correlation_overview.R` 重新计算五队列。）*
-- scRNA（GSE186344，Colab 运行，严格门控，高 NEUT≥0.70 且低 TNK/Mono≤0.60；肿瘤like 上皮 q=0.60）：
-  - 低ΔFM 中性粒亚群比例（样本层）：如 GSM5645901≈0.0188，GSM5645905≈0.0435；另两样本≈0。
-  - THBS1 关联：当前覆盖 n≈4，THBS1 中位值跨样本变异度不足，相关系数未定义（constant input），已在 results/figures/Figure5_scRNA_THBS1_Assoc.txt 记录。
-  - 图：results/figures/Figure5_scRNA_LowDFM_Fraction.pdf；表：results/tables/gse186344_neutrophil_lowDFM_fraction.tsv、results/tables/gse186344_sample_subpop_fraction.tsv 与 gse186344_subpop_thbs1_assoc.tsv；说明：THBS1 关联不足以估计（记录于 results/figures/Figure5_scRNA_THBS1_Assoc.txt）。
+- 背景线索：既往研究提示 CTSC 诱导炎症 → NETosis → 释放 NETs → 裂解 TSP1（THBS1）并促进转移；多篇工作将 NETs“标记（NET‑M）”与“功能（NET‑F）”强绑定。
+- 核心问题：标记并不等于功能，是否存在“标记与功能可解耦”的场景？在急性炎症期，文献多见“标记＜功能”。若在癌症转移的预防中标记与功能可分离，临床意义与用药分流将截然不同。
+- 我们的可量化表述：ΔFM = z(F) − z(M)
+  - NET‑F（功能端）：ELANE/PRTN3/CTSG（避免上游 ROS 生成组分混入）。
+  - NET‑M（标记端）：以 PADI4 为锚，在中性粒富集样本中做共表达扩展（v2，与 F 互斥）。
+- 研究假设：解耦为“脑转移微环境特异”，表现为“标记＞功能”（ΔFM 下降），并与 THBS1/ECM/血管生成等外生长轴耦合。
 
-反思（Reflection）
-- scRNA 的“负结果”并未否定 Bulk 的强证据；反而提示“低ΔFM”更可能是“细胞外、由 NETs 破裂后残留物定义”的稳态微环境信号（NET‑M 标记端成分相对 NET‑F 功能端更持久）。标准 scRNA 仅捕捉细胞内转录，无法直接记录这一“细胞外/非转录”的持久信号。
-- 这解释了：Bulk 层面 ΔFM 与 THBS1/ECM/外生长的耦合，以及单细胞层面难以在“活细胞转录”中稳定复现。
+统计口径与统一阈值
+- 检验：配对 Wilcoxon（Cliff’s δ 报效应量）、非配对 Mann‑Whitney/线性模型；相关采用 Spearman + BH FDR（α=0.05）。
+- 偏相关/混合模型：控制 Neutrophil 分数与 TumorPurity，分层或加入 (1|cohort/dataset)。
+- 报告：双侧检验，FDR<0.05；给出效应量与 95% CI；元分析随机效应（DL），I²<50% 为一致。
 
-推论（Inference）与后续验证
-- 机制模型（Figure6_Mechanism_Model.pdf）：NETs 解聚后，NET‑M（PADI4 相关）在组织微环境中相对 NET‑F（弹性蛋白酶复合体）更稳定，形成“低ΔFM 微环境”，与 THBS1/ECM/血管生成轴耦合，促外生长。
-- 建议实验：
-  - 病理/空间蛋白：IHC/IF 与空间蛋白组标记 NET‑M 残留、THBS1/TSP‑1 与 ECM/血管生成共定位。
-  - 蛋白组/质谱：NETs 降解产物与抑制因子平衡（SERPINA1/B1）与 ΔFM 的一致性；
-  - 多模态单细胞：CITE‑seq/空间蛋白捕捉“非转录”信号。
+小结与下一步
+- 结果要点：提出 ΔFM 作为“标记–功能失衡”的定量指标，明确定义 NET‑F/NET‑M 及统计口径，为后续 RNA/蛋白两层验证奠定统一框架。
+- 临床意义：若证实“标记＞功能”的脑特异解耦，将直接影响预防性干预与随访分层（功能锚点需单独监测）。
+- 下一步：在更多独立队列复核 ΔFM 稳定性，细化 NET‑M v2 模块与阴性对照集合，形成锁定版资源清单。
 
-图表生成与路径
-- 运行：`Rscript scripts/r/07_figures_story.R`（2025-09-21 已在本地 `.venv`/micromamba 环境中重新执行一次）。
-- 输出：`results/figures/`
-  - Figure1_DFM_Schematic.pdf：ΔFM 概念示意（ASCII 标签，避免字体编码问题）。
-  - Figure2_GSE184869_Paired_DFM.pdf（含 GSE125989）：配对 ΔFM 连线。
-  - Figure3_GSE184869_THBS1_Residuals.pdf：ΔFM 与 THBS1 偏相关（残差化）散点。
-  - Figure4_FM_Corr_Overview.pdf：F/M 相关性总览热图。
-  - Figure5_scRNA_LowDFM_Fraction.pdf 与 Figure5_scRNA_THBS1_Assoc.txt：单细胞低ΔFM 亚群比例与 THBS1 关联结论（目前以现有样本占比填充）。
-  - Figure6_Mechanism_Model.pdf：机制模型示意（NET‑M 残留 > NET‑F）。
+## 2. 转录组证据：肺不解耦，脑解耦（标记＞功能）
 
-可复现（本地/Colab）
-- 本地（严格门控已同步参数化）：
-  - 中性粒严格门控与亚群：
-    - `python3 scripts/py/sc_neutrophil_subsets.py --h5ad data/processed/scRNA/gse186344_colab.h5ad --net_f resources/modules/net_f_v1.tsv --net_m resources/modules/net_m_v2.tsv --outdir results/tables --neut_quantile 0.70`
-  - THBS1 关联（可调上皮门控）：
-    - `python3 scripts/py/sc_tumor_thbs1_assoc.py --h5ad data/processed/scRNA/gse186344_colab.h5ad --frac results/tables/gse186344_neutrophil_lowDFM_fraction.tsv --out results/tables/gse186344_subpop_thbs1_assoc.tsv --epi_quantile 0.60`
-- Colab（推荐用于海量 GSM 下载与处理；支持 .h5.gz、aria2c 并行）：
-  - `!python colab/gse186344_colab.py --gsm <12个GSM> --project_dir "/content/drive/MyDrive/NetsAnalysisProject" --neut_quantile 0.70 --epi_quantile 0.60`
+- 数据与设计（Bulk）
+  - 配对转移：GSE184869（RNA‑seq，已提供 log2 TMM CPM）、GSE125989（Affy GPL571）。
+  - 转移灶分层：GSE43837（脑），GSE14017/14018（非脑）。
+  - 协变量：Neutrophils（MCPcounter）、TumorPurity（tidyestimate/ESTIMATEScore→TumorPurity）。
+  - 评分：singscore 与 ssGSEA（GSVA≥2.2 新 API param 模式，行名去重聚合）。统一在样本内 z 标准化后计算 ΔFM。
 
-原始技术指引与数据清单（保留如下）
-NET‑F vs NET‑M 分析计划与交付（本地执行指引）
+- 主要结果（Bulk）
+  - ΔFM 配对差异（met−primary）
+    - GSE184869（RNA‑seq）：singscore Wilcoxon V=14, p=2.10e−4, FDR=3.22e−4，Cliff’s δ≈−0.70，n=20；ssGSEA 方向一致。
+      - 图：results/figures/Figure2_GSE184869_Paired_DFM.pdf
+      - 表：results/tables/GSE184869_paired_tests.tsv
+    - GSE125989（Affy）：V=91, p=0.252, FDR=0.298，Cliff’s δ≈0.25，n=16（不显著）。
+      - 表：results/tables/GSE125989_paired_tests.tsv
+  - ΔFM 与 THBS1 偏相关（控 Neutrophil + TumorPurity）
+    - GSE184869：singscore ρ=−0.3004, p=0.00415, FDR≈0.00831, n=90；ssGSEA ρ=−0.2732, p=0.00936, FDR≈0.00936。
+      - 图：results/figures/Figure3_GSE184869_THBS1_Residuals.pdf
+      - 表：results/tables/GSE184869_THBS1_residuals.tsv（偏相关备份：results/tables/GSE184869_thbs1_partial_cor.tsv）
+    - GSE125989：ρ=0.2269, p=0.2109, FDR≈0.3149（不显著）。
+  - F/M 相关性跨队列总览（5 队列 × 2 方法）
+    - GSE184869：singscore ρ=−0.2081, p=0.0491, FDR=0.098；ssGSEA ρ=−0.1216, p=0.2537。
+    - GSE125989：ρ=0.4941, p=0.00449, FDR=0.01495；ssGSEA ρ=0.4025, p=0.02314。
+    - GSE43837：ρ≈0.07–0.11；GSE14017：ρ≈0.23–0.26；GSE14018：ρ≈0.65–0.67（p≪0.001）。
+      - 图：results/figures/Figure4_FM_Corr_Overview.pdf
+      - 表：results/tables/fm_correlation_overview.tsv
 
-概览
-- 目标：在多队列（bulk + scRNA）统一框架下构建并比较 NET‑F（ELANE/PRTN3/CTSG）与 NET‑M（以 PADI4 为锚）的活性评分，形成核心指标 ΔFM = z(score_F) − z(score_M)。
-- 证据链：在转移灶层面验证 ΔFM 与上游/中游/下游通路与表型的共变关系，并在 scRNA 鉴定 PADI4^low & ELANE/PRTN3^high 亚群；进行鲁棒性与对照检验。
-- 执行顺序：配对转移优先（GSE184869/GSE125989）→ 转移灶 bulk（GSE43837/GSE14017/GSE14018）→ 单细胞（GSE186344）。
+- 单细胞（机制承载）GSE186344
+  - 严格门控（高 NEUT≥0.70 且低 TNK/Mono≤0.60）后，本次统计未找到稳定的中性粒细胞群（或门控结果为空/近 0），因此无法在中性粒内计算 ΔFM.cell 并锁定“低 ΔFM”亚群。
+  - 解释：更符合“中性粒已裂解成 NETs、功能端被抑制”的场景；scRNA 仅捕捉细胞内转录，难以直接记录这种细胞外/降解残留信号。
+    - 图：results/figures/Figure5_scRNA_LowDFM_Fraction.pdf（如为占位图请结合日志解读）
+    - 记录：results/figures/Figure5_scRNA_THBS1_Assoc.txt（样本量与常量化导致相关不可估）
+    - 表：
+      - results/tables/gse186344_neutrophil_lowDFM_fraction.tsv（可能为空/近 0，占位记录）
+      - results/tables/gse186344_sample_subpop_fraction.tsv（可能为空/近 0）
+      - results/tables/gse186344_subpop_thbs1_assoc.tsv（相关不可估的记录表）
 
-本地已下载数据（根目录）
-- 平台注释：`GPL96.annot.gz`, `GPL570.annot.gz`, `GPL571.annot.gz`, `GPL1352.annot.gz`
-- 配对/转移 bulk：
-  - `GSE184869_rna_seq_batch_corrected_log2_TMM_normalised_CPM_protein_coding_genes.xlsx`
-  - `GSE125989_series_matrix.txt.gz`, `GSE125989_RAW.tar`
-  - `GSE14017_series_matrix.txt.gz`, `GSE14017_RAW.tar`
-  - `GSE14018_series_matrix.txt.gz`, `GSE14018_RAW.tar`
-  - `GSE43837_series_matrix.txt.gz`, `GSE43837_RAW.tar`
-- 参考队列：`TCGA-BRCA.star_fpkm-uq.tsv.gz`, `TcgaTargetGtex_rsem_gene_tpm.gz`, `TCGA-CDR-SupplementalTableS1.xlsx`, `brca_metabric.tar.gz`
-- 单细胞：`GSE186344_RAW.tar`
+- 执行脚本（转录组）
+  - R：scripts/r/02_covariates_estimate.R、scripts/r/03_scores_deltafm.R、scripts/r/04_bulk_stats_mvp.R、scripts/r/05_pathway_scores.R、scripts/r/06_fm_correlation_overview.R
+  - Py（scRNA/辅助）：scripts/py/sc_preprocess_gse186344.py、scripts/py/sc_neutrophil_subsets.py、scripts/py/sc_tumor_thbs1_assoc.py、scripts/py/sc_figures.py、scripts/py/process_gse184869_excel.py
 
-项目目录规划（不移动现有原始文件）
-- 原始数据（保持在根目录）：上述 GEO/TCGA/METABRIC 压缩或矩阵文件。
-- 处理与结果：
-  - `data/processed/`：各数据集标准化/整合后的表达矩阵与元数据（RDS/RData/TSV/H5AD）。
-  - `resources/`：基因集合（GMT/TSV）、模块清单、对照基因集、配置 YAML。
-  - `scripts/r/`：bulk 分析与统计建模（R）。
-  - `scripts/py/`：scRNA 与图谱相关（Python/Scanpy）。
-  - `workflow/`：Snakemake 或 targets/drake 流程文件。
-  - `results/figures/`：F1–F8 图表（PDF/SVG）。
-  - `results/tables/`：主结果表与补充表（CSV/TSV）。
-  - `logs/`：运行日志与会话信息（sessionInfo/conda env）。
+小结与下一步
+- 结果要点：Bulk 层面在脑转移显示 ΔFM 显著下降并与 THBS1 负相关；肺/非脑未见同等强度的解耦。scRNA 在本次严格门控统计中未检出稳定的中性粒细胞群（或门控为空/近 0），因此“低 ΔFM 中性粒亚群比例”不可稳定估计；这与“中性粒已裂解为 NETs、功能端受抑”的解释一致。
+- 临床意义：提示“低 ΔFM 微环境”更可能是细胞外/降解残留层面的稳态信号，更适合体液蛋白/肽与空间蛋白读出，而非依赖单细胞转录。
+- 下一步：扩充脑/非脑转移队列（GSE43837/14017/14018 全量），完善偏相关/残差图；考虑空间蛋白/空间转录验证；在 scRNA 侧放宽门控或采用含粒细胞保存度更高的数据源做方向性复核。
 
-环境与依赖（建议）
-- Conda 环境：
-  - R：`limma`, `edgeR`, `sva`, `GSVA`, `singscore`, `estimate`, `MCPcounter`, `ppcor`, `metafor`, `psych`（相关比较），`ggplot2`, `ComplexHeatmap`, `data.table`, `readxl`。
-  - Python：`scanpy`, `anndata`, `harmonypy`, `pandas`, `numpy`, `matplotlib`, `seaborn`, `gseapy`, `pyAUCell`（或 R AUCell via reticulate/替代）。
-- 版本锁定与记录：`env/environment.yml`（conda），`R/renv.lock`（可选）；运行时导出 `logs/sessionInfo_*.txt`。
+## 3. 蛋白/肽层证据与机制：Serpin 抑制导致“标记＞功能”（脑特异）
 
-模块与通路资源（resources/）
-- `resources/modules/net_f_v1.tsv`：ELANE, PRTN3, CTSG（功能端种子）。
-- `resources/modules/net_m_v1.tsv`：PADI4（标记端锚点）。
-- `resources/modules/net_f_v2.tsv` 与 `net_m_v2.tsv`：扩展版（相关网络筛选，互斥）。
-- `resources/pathways/msigdb_hallmark.gmt`：HALLMARK 集合（TNFA/NFKB, IL6/JAK/STAT3, ROS, G2M, E2F, ANGIOGENESIS, EMT）。
-- `resources/pathways/reactome_go_p38_il1.gmt`：p38 MAPK 与 IL‑1 响应。
-- `resources/controls/`：随机同大小集合、无关粒细胞基因集、抑制剂平衡对（ELANE:SERPINA1, PRTN3:SERPINB1）。
+- 挑战：多数公开队列中 NET‑F（ELANE/PRTN3/CTSG）蛋白/肽难以稳定检出。为避免“未检出=无功能”的误解，我们构建三类功能读出与两类桥接：
+  - ISI（Inhibitor–Protease Stoichiometry）指数：ISI = log2(Σ 抑制子 / Σ 靶蛋白)；抑制子 core：SERPINA1/A3/SERPINB1/B6/B8（扩展：SLPI/ELAFIN/A2M）。
+  - MNAR（Missingness‑as‑Signal）：以“是否检出 F/M”作因变量，Serpin_score 为自变量，(1|cohort) 随机项；M 作为阴性对照。
+  - 底物足迹（NE/PR3 footprint）：半/非胰切口的 N‑端富集位点汇总成足迹指数。
+  - THBS1 裂解指数：log2(neo‑N sum) − log2(tryptic N sum)（半胰重搜）。
+  - RNA→蛋白桥接：Proteo‑ΔFM ~ Serpin_RNA * organ + 协变量；控制中性粒/纯度。
 
-统一评分与核心指标
-- Bulk 评分：并行计算 `singscore` 与 `ssGSEA(GSVA)`；对每个数据集内做 z 标准化。
-- scRNA 评分：`AUCell` + `AddModuleScore`（Scanpy/Seurat 等价）并做深度校正；样本层聚合。
-- 核心量：`ΔFM = z(score_F) − z(score_M)`；对比 `score_M` 的增益（ΔR²、ΔAIC、偏相关）。
-- 协变量：中性粒浸润（MCP-counter/xCell/CIBERSORT 选1–2）、肿瘤纯度（ESTIMATE 或现成字段）、批次/平台（阵列：RMA+ComBat；RNA‑seq：TMM/TPM+voom；不跨平台合并）。
+- 已执行与结果（严格证据链）
+  - ISI（scripts/py/isi_model.py）
+    - 输出：results/tables/isi_per_sample.tsv、results/tables/isi_models.tsv
+    - 结论：PXD046330/PXD005719/PXD051579 中 F 目标和为 0，ISI 不可定义，符合“F 被抑制/难检出，而 M 持续”。
+  - MNAR（scripts/py/mnar_detection_model.py）
+    - 输出：results/tables/mnar_detection_table.tsv、results/tables/mnar_logit_results.tsv
+    - 结论：detect_F=0、detect_M=1（几乎全样本）；Logit 不可估但模式明确。
+  - 足迹（scripts/py/footprint_indices.py）
+    - 输出：results/tables/footprints.tsv
+    - 结论：指数整体为负；PXD005719 脑变体低于亲本（≈ −0.786 vs −0.633），与 THBS1 方向一致；PXD046330/PXD051579 足迹偏负。
+  - 分层相关（results/tables/assoc_summary.tsv）
+    - 足迹 vs Serpin：合并 ρ≈−0.563, q≈0.00182；非脑 ρ≈−0.560, q≈0.00130；脑层 n 小未稳。
+    - THBS1 abundance vs Serpin：合并 ρ≈+0.583, q≈0.00218；非脑 ρ≈+0.611, q≈0.00130。
+    - Proteo‑ΔFM vs Serpin：弱且不显著（ρ≈+0.225, p≈0.29），因 F 全缺信号弱化。
+  - 混合效应（scripts/py/mixed_effects_a3.py）
+    - 模型：endpoint ~ Serpin_score_core * organ + log_total_PSMs + (1 | dataset)
+    - 输出：results/tables/mixed_effects_a3.tsv；诊断图：results/figures/mixed_effects_diagnostics.pdf
+    - 结果：THBS1 abundance β_Serpin≈+0.028（未显著）；足迹模型脑层 n 小出现 singular（表内注明）。
+  - 成长模型（非脑，scripts/py/mixed_effects_growth.py）
+    - 输出：results/tables/mixed_effects_growth.tsv、results/tables/mixed_effects_messages.txt
+    - 足迹 ~ Serpin：β≈+0.0027, p≈4e−20（指数为负，小正 β 表示抑制增强→足迹更负）。
+    - THBS1 裂解 ~ Serpin：β≈−0.011（p≈0.41）；THBS1 log abundance ~ Serpin：β≈+0.0125（p≈0.30）。
+  - SEM（探索性；scripts/py/prepare_sem_data.py + scripts/r/14_sem_model.R）
+    - 输出：results/tables/sem_input.tsv、results/models/sem_results.json、results/figures/A3_sem_path.svg
+    - 说明：n≈24，有不可逆信息矩阵与负方差警告，仅作概念示意。
 
-分阶段执行步骤（可复现流水线）
-1) 数据准备与标准化（bulk）
-   - 输入：根目录的 `GSE*_series_matrix.txt.gz`、`*_RAW.tar`、`GSE184869_*.xlsx`、`TCGA*`、`METABRIC`。
-   - 处理：
-     - 阵列：RMA（raw CEL 在 `*_RAW.tar`；若只用 series matrix 则直接 log2 标准化与批次标注）、按 GPL 注释统一基因符号、ComBat 去批。
-     - RNA‑seq：TMM/TPM + voom；`GSE184869` 已给 log2 TMM CPM，可直接入模但保留批次字段。
-     - 生成样本元数据：样本类型（原发/转移/脑转移/部位）、配对 ID、平台/批次、PAM50（TCGA/METABRIC）、是否肿瘤细胞比例字段。
-   - 输出：
-     - `data/processed/<dataset>/<dataset>.expr.tsv.gz`（gene × sample）。
-     - `data/processed/<dataset>/<dataset>.pheno.tsv`（样本信息）。
-     - `data/processed/<dataset>/<dataset>.platform.tsv`（平台/批次/注释）。
+- 跨层整合与图示
+  - 样本对齐：results/tables/multiomics_alignment.tsv、results/tables/multiomics_pairwise_deltas.tsv（PXD046330↔GSE96860；PXD005719↔GSE12237）。
+  - 特征汇总：results/tables/multilayer_sample_map.tsv、results/tables/multilayer_features.tsv（RNA ΔFM、Proteo‑ΔFM、Serpin、THBS1 裂解、ROS/MPO 占位）。
+  - 机制总图：“双层三明治”（脑 vs 肺/非脑）：results/figures/F_double_sandwich.pdf。
 
-2) 协变量估计（bulk）
-   - 输入：步骤1输出表达矩阵。
-   - 处理：MCP‑counter/xCell/CIBERSORT 计算中性粒分数；ESTIMATE 计算 Stromal/Immune/Tumor purity。
-   - 输出：`data/processed/<dataset>/<dataset>.covariates.tsv`（Neutrophil, Purity, Batch, PAM50 等）。
+- 执行脚本（蛋白/肽层）
+  - Py：scripts/py/isi_model.py、scripts/py/mnar_detection_model.py、scripts/py/footprint_indices.py、scripts/py/thbs1_cleavage_index.py、scripts/py/proteomics_deltafm_score.py、scripts/py/serpin_scores.py、scripts/py/mixed_effects_a3.py、scripts/py/mixed_effects_growth.py、scripts/py/prepare_sem_data.py、scripts/py/module_scores.py、scripts/py/module_assoc.py
+  - R：scripts/r/12_mixed_effects.R、scripts/r/14_sem_model.R
 
-3) 模块扩展与基因集准备
-   - 输入：种子模块、转移灶（优先）中性粒富集样本/集群的表达矩阵。
-   - 处理：对种子基因做相关网络，筛选稳健共表达基因（阈值建议 |ρ|>0.3，跨样本/集群一致；互斥 NET‑F/NET‑M），形成 v2。
-   - 输出：`resources/modules/net_f_v2.tsv`, `resources/modules/net_m_v2.tsv`；并生成版本说明 `resources/modules/README.tsv`。
+小结与下一步
+- 结果要点：F 端在多个蛋白队列中呈“完全缺失/难检出”，而 M 端稳定；Serpin 分数与 NE/PR3 底物足迹负相关、与 THBS1 蛋白量正相关；混合效应的方向一致，SEM 概念模型与“Serpin 抑制→F 活性受抑→THBS1 裂解下降→ΔFM↓”相符。
+- 临床意义：功能锚点（足迹/THBS1 裂解）在体液样本中具可行性，可与标记端联合用于风险识别；亦提示在脑微环境中优先针对“抑制–蛋白酶平衡”的调节策略。
+- 下一步：系统化半胰重搜以量化 THBS1 裂解指数；实现肽水平零膨胀/层级模型；跨队列元分析“缺失即信号”；补充 SLPI/ELAFIN/A2M 的灵敏度分析。
 
-4) 评分计算与 ΔFM（bulk）
-   - 输入：步骤1表达矩阵、步骤3基因集。
-   - 处理：singscore 与 ssGSEA 并行；z 标准化；生成 `score_F`, `score_M`, `ΔFM`；同时计算通路分数（MSigDB/Reactome）。
-   - 输出：
-     - `data/processed/<dataset>/<dataset>.scores.tsv`（样本 × 指标：score_F/score_M/ΔFM/通路）。
-     - `results/tables/<dataset>_scores_summary.tsv`（描述统计）。
+## 4. 临床意义：早期液体生物标志物原型（l‑NFS）
 
-5) 转移灶主线检验（bulk）
-   - 配对差异：同例转移 vs 原发的 ΔFM（配对检验 + Cliff’s δ）。
-   - 分组差异：脑转移 vs 其他部位（Mann‑Whitney/线性模型）。
-   - 分段相关：上游（CTSC/PRTN3/IL1B、NF‑κB/IL‑1）、中游（p38/ROS）、下游（THBS1↓、ECM/血管/增殖↑、休眠↓）。
-   - 部分相关/多变量：控制中性粒浸润、纯度、PAM50、批次，比较 ΔFM 与 score_M 的独立效应与增益（Steiger/Meng 相关比较）。
-   - 输出：
-     - `results/tables/<dataset>_paired_tests.tsv`, `<dataset>_group_tests.tsv`。
-     - `results/tables/<dataset>_segment_cor_partial.tsv`（ρ/β、FDR、95%CI）。
-     - `results/tables/<dataset>_model_compare.tsv`（ΔR²/ΔAIC/偏相关）。
+- 目标：在 CSF/Plasma 中用“功能近端锚点（足迹/THBS1）+ 标记锚点（NET‑M/Serpin）”组合，预测脑转移高风险，指导预防用药与影像随访频率。
 
-6) 解耦与对照检验（bulk）
-   - 残差相关：`res_F = lm(score_F ~ Neutrophil + Purity + PAM50 + Batch)` 残差 vs `res_M` 残差；跨队列森林图。
-   - 对照：随机同大小集、无关粒细胞集，基因置换 1,000 次经验 p 值；抑制剂平衡（ELANE:SERPINA1, PRTN3:SERPINB1）。
-   - 输出：`results/tables/<dataset>_residual_corr.tsv`, `results/tables/<dataset>_null_perm.tsv`，以及元分析表 `results/tables/meta_*`。
+- 统一入口脚本：scripts/py/site_triage_liquid.py
+  - --mode maxquant：读取 MaxQuant txt/ + 补充临床表，产出 run+patient 特征与单队列模型。
+  - --mode csf：解析三层表头矩阵，仅保留 Area，构建 Serpin、NET‑F/M、THBS1/footprint 代理与 CSF 模型。
+  - --mode plasma：跨队列融合（主 PXD032767；辅 PXD018301），加入 dataset_indicator，并输出稳健 Logit 与 (1|dataset) 混合效应。
 
-7) 单细胞（GSE186344）
-   - 预处理：QC（空滴、线粒体比例、双tscore）、归一化、HVG、批次整合（Harmony/CCA）、注释中性粒（S100A8/A9, CSF3R, FCGR3B, CXCR2, MPO）。
-   - 模块评分：在中性粒细胞计算 NET‑F/NET‑M/ΔFM.cell（AUCell + module score），深度校正；Leiden/Louvain 聚类。
-   - 亚群：筛选 PADI4^low & ELANE/PRTN3^high；样本层计算该亚群比例；关联外生长 proxy（同队列 bulk 或肿瘤细胞增殖/ECM/血管分数）。
-   - 输出：
-     - `data/processed/scRNA/gse186344.h5ad`（整合对象）。
-     - `results/tables/gse186344_neutrophil_cluster_markers.tsv`，`gse186344_sample_subpop_fraction.tsv`。
+- 队列与结果
+  - CSF（MSV000089062，n=72，BrainMet=17）
+    - 特征：data/processed/proteomics/MSV000089062/csf_patient_features.tsv
+    - 模型：results/tables/msv000089062_csf_metrics.tsv（5 折 AUC≈0.70，整体 AUC≈0.66）
+    - 诊断：results/tables/msv000089062_csf_{roc,pr,calibration,dca}.tsv；Spearman：..._spearman.tsv
+    - 备注：源矩阵缺乏 THBS1/NE 裂解位点 → 稳健 Logit 奇异，日志中注明。
+  - Plasma‑EV（PXD018301，n=512，BrainMet=12；三层表头自动抽取 Area）
+    - 特征：data/processed/proteomics/PXD018301/csf_patient_features.tsv（含 sample_id/dataset）
+    - 模型：results/tables/pxd018301_csf_metrics.tsv（5 折 AUC≈0.62，整体 AUC≈0.60）
+    - 稳健 Logit（HC3 手工实现）：results/tables/pxd018301_csf_robust_logit.tsv（THBS1_log↓、footprint_index↓、THBS1_cleave_idx↑ 均 p<0.05）
+  - 跨队列 Plasma（PXD032767×PXD018301，n=565，BrainMet=29）
+    - 融合：results/tables/pxd032767_pxd018301_plasma_metrics.tsv（5 折 AUC≈0.79 / AP≈0.21；整体 AUC≈0.75）
+    - 稳健 Logit：results/tables/..._plasma_robust_logit.tsv（THBS1_log↓、footprint_index↓、THBS1_cleave_idx↑ 显著；Proteo‑ΔFM 正向；dataset_indicator<0）
+    - 混合效应（1|dataset）：results/tables/..._plasma_mixed_effects.tsv（方向与稳健 Logit 一致；示例：dataset_indicator β≈−0.65, p≈0.003）
+  - 图：
+    - ROC：results/figures/site_triage_roc.{pdf,png}
+    - 效应量：results/figures/site_triage_effects.{pdf,png}
 
-8) 图表与最终交付
-   - F1 流程图：`results/figures/F1_workflow.pdf`。
-   - F2 配对 ΔFM：`results/figures/F2_paired_deltaFM.pdf`。
-   - F3 脑转移 vs 其他部位：`results/figures/F3_site_deltaFM.pdf`。
-   - F4 分段偏相关热图：`results/figures/F4_segment_partial_corr.pdf`。
-   - F5 THBS1 vs ΔFM：`results/figures/F5_thbs1_deltaFM_regression.pdf`。
-   - F6 残差相关森林图：`results/figures/F6_residual_corr_forest.pdf`。
-   - F7 scRNA UMAP 与亚群：`results/figures/F7_scRNA_umap_subpop.pdf`；样本比例相关：`F7b_subpop_fraction_assoc.pdf`。
-   - F8 鲁棒性与负对照：`results/figures/F8_robustness_controls.pdf`。
-   - 附表：模块基因表、协变量定义、各队列 QC 指标：`results/tables/Supp_*`。
+小结与下一步
+- 结果要点：CSF 与 Plasma 原型在多数据集上达到可用的 AUC 水平（约 0.60–0.79 不等），稳健 Logit 与 (1|dataset) 混合效应一致指向“THBS1_log 下降、footprint 下降、THBS1 裂解上升”为风险特征；Proteo‑ΔFM 在跨队列融合中为正向贡献。
+- 临床意义：为脑转移高风险早筛与随访频率分层提供可实施管线；可与影像学协同，降低不必要随访。
+- 下一步：外部验证（独立血浆/CSF 队列）、阈值与决策曲线优化、与炎症/免疫共变项的特异性检验、前瞻性样本设计。
 
-MVP 优先包（先行完成）
-- GSE184869/GSE125989：验证转移灶 ΔFM↑（配对），与 THBS1↓ / 增殖/ECM↑ 偏相关（控浸润/纯度）。
-- GSE186344：定义 PADI4^low & ELANE/PRTN3^high 亚群，样本比例与外生长 proxy 关联。
-- 对应最少生成文件：
-  - `data/processed/GSE184869/*.tsv`, `data/processed/GSE125989/*.tsv`。
-  - `results/tables/GSE184869_*`, `GSE125989_*`；`results/figures/F2/F5`。
-  - `data/processed/scRNA/gse186344.h5ad`；`results/tables/gse186344_sample_subpop_fraction.tsv`；`results/figures/F7*`。
+- 现场问题与修正（液体原型）
+  - PXD032767 未公开非脑 RAW → 通过 Supplementary Table S1 映射患者分组；构建 run_manifest.tsv 并以 MaxQuant 直接计算足迹/THBS1。
+    - 临床表：data/interim/proteomics/PXD032767/metadata/clinical_metadata.tsv
+    - 运行表：data/interim/proteomics/PXD032767/metadata/run_manifest.tsv
+    - 中间/特征：data/interim/proteomics/PXD032767/metadata/{footprint_maxquant.tsv, thbs1_cleavage.tsv}
+  - MSV000089062 缺乏 THBS1/NE 裂解位点 → 近端锚点退化；保留为透明记录，主展示 ROC/效应量。
+  - PXD018301 多层表头 → 修复为“仅保留 Area，以第 2 层样本名重命名列”。
+  - statsmodels HC3：Logit 无现成交互 → 手动实现 HC3（杠杆 h 与残差构造 meat 矩阵）。
+  - 混合效应：采用 BinomialBayesMixedGLM，报告 fe_mean/fe_sd；与稳健 Logit 方向一致。
 
-代码组织与脚本入口（示例，不立即执行）
-- R（scripts/r/）
-  - `00_utils_io.R`：IO/注释/对齐基因符号。
-  - `01_preprocess_bulk.R`：阵列 RMA/ComBat、RNA‑seq TMM/voom；导出 expr/pheno。
-  - `02_covariates_scores.R`：MCP‑counter/ESTIMATE、singscore、GSVA、通路分数、ΔFM。
-  - `03_stats_bulk.R`：配对/分组差异、分段偏相关、模型比较、残差相关、置换与对照。
-  - `04_meta_analysis.R`：跨队列元分析与森林图。
-  - `05_figures_bulk.R`：F2–F6–F8 图表。
-- Python（scripts/py/）
-  - `sc_preprocess_gse186344.py`：QC、整合、注释中性粒、保存 H5AD。
-  - `sc_scores_clusters.py`：AUCell + module score、ΔFM.cell、聚类与亚群识别、样本比例计算。
-  - `sc_figures.py`：UMAP、分数分布、样本比例相关图。
-- 配置与流程
-  - `resources/config.yml`：数据集路径、平台/批次字段、协变量方法、评分参数、阈值。
-  - `workflow/Snakefile` 或 `workflow/_targets.R`：串联步骤 1–8；产出到 `results/`。
+## 5. 失败与调整（透明记录）
 
-统计与阈值（统一标准）
-- 双侧检验，FDR<0.05；报告效应量（Cliff’s δ/ρ/β）与 95% CI。
-- 元分析：随机效应（DL 法），I²<50% 视为一致；异质性高使用方向一致 + 过半显著。
-- 相关比较：Steiger/Meng；置换 1,000 次经验 p 值。
+- 转录组：scRNA THBS1 相关因样本量与常量化不可估，且本次严格门控未检出稳定的中性粒细胞群（或门控为空/近 0），因此“低 ΔFM 中性粒亚群比例”无法稳定估计；更符合“中性粒已裂解成 NETs、功能端受抑”的解释。
+- 蛋白/肽层：NET‑F 目标稀疏，ISI 与 Logit 在若干队列不可估；改以“缺失即信号 + 足迹/THBS1 裂解”双锚点承载功能信号。
+- 混合效应：statsmodels==0.14.5 更新后仍有 singular 警告（低 n 合理），系数方向稳定；信息记录在 results/tables/mixed_effects_messages.txt。
+- SEM：n≈24，模型识别度受限（不可逆信息矩阵、负方差），仅作机制示意。
+- Metabolomics：Workbench（ST000745/ ST001104/ ST002921）仅 mwTab 元信息 + RAW，缺命名矩阵，红氧化比（GSH/GSSG）暂不可算；脚本先归档待恢复。
 
-数据集要点与备注
-- `GSE184869`：已批次校正的 log2 TMM CPM（蛋白编码），可直接评分；仍需提取配对与部位信息。
-- `GSE125989/GSE14017/GSE14018/GSE43837`：若使用 `*_RAW.tar`，需 RMA；若先用 series matrix，可直接进入评分但保留平台/批次。
-- `GSE186344`：scRNA RAW 包体积较大，建议先解压到临时目录，输出整合对象到 `data/processed/scRNA/gse186344.h5ad`。
-- `TCGA-BRCA` 与 `METABRIC`：用于亚型/协变量与参照，不参与原发预测主线合并；不跨平台混合表达矩阵。
+## 6. 数据、目录与环境（统一约定）
 
-运行顺序（建议）
-1. 先完成 MVP：GSE184869/GSE125989（bulk）→ GSE186344（scRNA）。
-2. 扩展到 GSE43837/GSE14017/GSE14018（转移灶 bulk）。
-3. 整体元分析与鲁棒性网格（评分方法 × 模块版本 × 协变量组合）。
+- 目录结构
+  - 原始：data/raw/<dataset>/（保留 checksums.sha256）
+  - 中间：data/interim/<modality>/<dataset>/（mzML、搜索工作区、临时 TSV）
+  - 处理后：data/processed/<dataset>/（基因/蛋白矩阵、裂解指数、协变量）
+  - 资源：resources/modules/、resources/manifests/、resources/annotation/（包括 gencode.v43.basic.annotation.gtf.gz）、resources/msfragger/
+  - 结果：results/tables/、results/figures/
 
-产出清单对标（F1–F8）
-- 详见“图表与最终交付”章节的文件路径；所有图表 PDF/SVG 同步导出，表格 CSV/TSV 同步导出。
+- 环境与工具
+  - Proteomics 环境：env/proteomics.yml；激活：
+    - export MAMBA_ROOT_PREFIX="$PWD/env/.mamba"
+    - env/bin/micromamba env create -y -f env/proteomics.yml
+    - eval "$(env/bin/micromamba shell hook -s bash)"
+    - micromamba activate proteomics
+    - export PATH="$PWD/env/bin:$PATH"；philosopher version（自检）
+  - RNA bigWig：已集成 pybigwig 与 gffread；注释：resources/annotation/gencode/gencode.v43.basic.annotation.gtf.gz
+  - R 包缓存（可选）：R_LIBS_USER=env/.R（msqrob2/lmerTest/plot 等）
+  - 长作业：tmux/screen；日志到 logs/（例：logs/proteomics/pipeline_<timestamp>.log）
+  - 脚本化环境：scripts/sh/setup_proteomics_env.sh（可一键拉起 proteomics 依赖）；RAW→mzML：scripts/sh/run_trfp_parallel.sh；端到端烟测：scripts/sh/msfragger_smoke.sh；GSE186344 补充抓取：scripts/sh/fetch_gse186344_suppl.sh。
 
-注意与风险缓解
-- 中性粒计数混杂：统一纳入 Neutrophil 分数与纯度；报告残差与偏相关。
-- 平台异质性：不跨平台合并表达；队列内得效应量后做元分析。
-- scRNA 中性粒易丢失：严格 QC、样本层聚合，并可引入外部同癌种/同部位 scRNA 方向验证。
-- 标记/功能边界：保留 v1 种子与 v2 扩展两版，主文以 v1 种子为主，扩展为鲁棒性验证。
+- 数据获取（示例命令）
+  - PRIDE：bash scripts/sh/fetch_pride_dataset.sh PXD011796 --categories RAW,RESULT --dest data/raw/PXD011796
+  - PXD005719：scripts/sh/fetch_pride_dataset.sh PXD005719 --categories RAW,RESULT --dest data/raw/PXD005719
+  - PXD046330：scripts/sh/fetch_pride_dataset.sh PXD046330 --categories RAW,RESULT --dest data/raw/PXD046330
+  - PXD051579（暂停）：scripts/sh/fetch_pride_dataset.sh PXD051579 --categories RAW,RESULT --dest data/raw/PXD051579
+  - GSE96860 bigWig：python scripts/py/process_gse_bigwig.py --bigwig-dir data/raw/transcriptomics/GSE96860 --gtf resources/annotation/gencode/gencode.v43.basic.annotation.gtf.gz --dataset GSE96860 --output-dir data/processed/GSE96860
+  - GSE12237 芯片：python scripts/py/parse_series_matrix.py --series data/raw/transcriptomics/GSE12237/GSE12237_series_matrix.txt.gz --gpl data/raw/transcriptomics/GSE12237/GPL96.annot.gz --dataset GSE12237 --outdir data/processed/GSE12237
+  - CSF 蛋白组（多来源）：scripts/sh/fetch_pride_dataset.sh <CSF_ACCESSION> --categories RESULT --match 'CSF' --dest data/raw/<CSF_ACCESSION>
+  - CSF 代谢组：aria2c -c -x16 -s16 --max-tries=0 --retry-wait=30 -i resources/manifests/metabolomics_urls.txt -d data/raw/metabolomics
 
-附：常用命令（示例，仅作为执行参考）
-- 创建目录：`mkdir -p data/processed resources/modules resources/pathways resources/controls scripts/r scripts/py workflow results/figures results/tables logs`
-- 生成评分（R）：`Rscript scripts/r/02_covariates_scores.R --dataset GSE184869 --config resources/config.yml`
-- scRNA 预处理（Py）：`python scripts/py/sc_preprocess_gse186344.py --raw GSE186344_RAW.tar --out data/processed/scRNA/gse186344.h5ad`
+## 7. 可复现脚本入口与建议顺序
 
-**执行进展与思路更新（Bulk 收官 → scRNA 启动）**
-- **GSVA 修复与统一口径**: 适配 GSVA>=2.2 新 API（`ssgseaParam` + `gsva(param)`），在评分与通路脚本内统一处理；对表达矩阵行名去重（按样本列取最大值）并实现 Ensembl→Symbol 映射与聚合，避免重复行名报错。
-- **协变量（官方口径）**: 优先使用 `MCPcounter` 与 `tidyestimate` 计算协变量，生成 `Neutrophils` 与 `TumorPurity`；RNA‑seq 队列在 `tidyestimate` 仅输出 `ESTIMATEScore` 时，按 ESTIMATE 原公式推导 `TumorPurity`。见 `data/processed/<ds>/<ds>.covariates.tsv`。
-- **模块与 ΔFM 稳定性**: 在 GSE125989 的中性粒富集样本中，以 PADI4 为锚做共表达扩展，生成 `resources/modules/net_m_v2.tsv`（互斥于 NET‑F）；统计脚本统一“现场重算 ΔFM”，避免常数化偏差。
-- **MVP 关键结果（配对与偏相关）**:
-  - `GSE184869`（RNA‑seq，脑转移配对）：ΔFM（met−primary）显著下降（singscore: V=14, p=2.10e−4, FDR=3.22e−4；ssGSEA 类似，Cliff’s δ≈−0.70，n=20）；偏相关 ΔFM ↔ THBS1（控 Neutrophil + TumorPurity）显著负相关（singscore: ρ=−0.3004, FDR≈0.0083；ssGSEA: ρ=−0.2732, FDR≈0.0094，n=90）。
-  - `GSE125989`（Affy，配对）：配对差异不显著；偏相关与 THBS1 未达显著（FDR>0.2）。
-  - 结果表均已标注来源：`neutrophil_source` 与 `purity_source`，见 `results/tables/*_paired_tests.tsv`, `*_thbs1_partial_cor.tsv`。
-- **F/M 相关性（解耦证据）**: 新增总览表 `results/tables/fm_correlation_overview.tsv`（5 队列 × 2 方法）。`GSE184869` 中 `F/M` 相关性最低且为负（singscore: ρ≈−0.21, FDR≈0.10），而多数其他队列为正相关（如 `GSE14018`：ρ≈0.65–0.67, FDR≪0.01），支持“脑转移微环境特异性解耦”的核心假说。
-- **通路资源**: 通过 `msigdbr` 缓存 `resources/pathways/msig_*.rds`，并导出筛选清单 `resources/pathways/selected_sets.tsv`（Reactome p38 与 GO:BP IL‑1 相关集合）。各队列通路分数见 `data/processed/<ds>/<ds>.pathways.tsv`。
-- **关键脚本更新**:
-  - 评分与 ΔFM：`scripts/r/03_scores_deltafm.R`（GSVA 新 API、去重、映射、并行 singscore/ssGSEA）。
-  - 协变量：`scripts/r/02_covariates_estimate.R`（MCPcounter + tidyestimate，RNA‑seq 纯度推导，代理回退）。
-  - 统计（MVP）：`scripts/r/04_bulk_stats_mvp.R`（配对检验、THBS1 偏相关、来源注释、现场重算 ΔFM）。
-  - 通路评分：`scripts/r/05_pathway_scores.R`（ssGSEA + 缓存基因集）。
-  - F/M 相关性总览：`scripts/r/06_fm_correlation_overview.R`。
+- Bulk（MVP）
+  - Rscript scripts/r/02_covariates_estimate.R --dataset GSE184869 --config resources/config.yml
+  - Rscript scripts/r/03_scores_deltafm.R --dataset GSE184869 --config resources/config.yml
+  - Rscript scripts/r/04_bulk_stats_mvp.R --dataset GSE184869 --config resources/config.yml
+  - Rscript scripts/r/05_pathway_scores.R --dataset GSE184869 --config resources/config.yml
+  - Rscript scripts/r/06_fm_correlation_overview.R --config resources/config.yml
 
-**Step 3｜单细胞（GSE186344）执行计划与脚本**
-- **预处理与细胞鉴定**（阶段 1）
-  - 脚本：`scripts/py/sc_preprocess_gse186344.py`
-  - 输入：`GSE186344_RAW.tar`（或解压根目录）
-  - 处理：自动发现多个 10x 样本，合并；QC（min_genes≥200、线粒体<20%）、Normalize/log1p、HVG、PCA、Harmony(by sample, 若可用)、邻域/UMAP/Leiden。
-  - 输出：`data/processed/scRNA/gse186344.h5ad`
-- **中性粒与低ΔFM亚群**（阶段 2）
-  - 脚本：`scripts/py/sc_neutrophil_subsets.py`
-  - 动作：中性粒标记打分→门控中性粒→计算 NET‑F/NET‑M 分数与 ΔFM.cell→在中性粒内聚类并锁定“NET‑M高 & NET‑F低”的低ΔFM 亚群；输出样本层亚群比例与 markers。
-  - 输出：
-    - `results/tables/gse186344_neutrophil_lowDFM_fraction.tsv`
-    - `results/tables/gse186344_lowDFM_markers.tsv`
-- **样本层关联（关键验证）**（阶段 3）
-  - 脚本：`scripts/py/sc_tumor_thbs1_assoc.py`
-  - 动作：识别上皮/肿瘤like 细胞（EPCAM/KRT*）、计算样本层 THBS1 中位表达；与低ΔFM 中性粒亚群比例做 Spearman 相关。
-  - 输出：`results/tables/gse186344_subpop_thbs1_assoc.tsv`
-- **细胞通讯（可选机制）**（阶段 4）
-  - 方案：后续可导出对象到 CellChat/NicheNet/LIANA，验证与肿瘤/内皮细胞的互作轴是否与外生长相关。
+- scRNA（GSE186344）
+  - python scripts/py/sc_preprocess_gse186344.py --raw GSE186344_RAW.tar --out data/processed/scRNA/gse186344.h5ad
+  - python scripts/py/sc_neutrophil_subsets.py --h5ad data/processed/scRNA/gse186344.h5ad --net_f resources/modules/net_f_v1.tsv --net_m resources/modules/net_m_v2.tsv --outdir results/tables
+  - python scripts/py/sc_tumor_thbs1_assoc.py --h5ad data/processed/scRNA/gse186344.h5ad --frac results/tables/gse186344_neutrophil_lowDFM_fraction.tsv --out results/tables/gse186344_subpop_thbs1_assoc.tsv
 
-**Step 3｜一键运行命令（建议顺序）**
-- 预处理：`python3 scripts/py/sc_preprocess_gse186344.py --raw GSE186344_RAW.tar --out data/processed/scRNA/gse186344.h5ad`
-- 中性粒与亚群：`python3 scripts/py/sc_neutrophil_subsets.py --h5ad data/processed/scRNA/gse186344.h5ad --net_f resources/modules/net_f_v1.tsv --net_m resources/modules/net_m_v2.tsv --outdir results/tables`
-- 样本层关联：`python3 scripts/py/sc_tumor_thbs1_assoc.py --h5ad data/processed/scRNA/gse186344.h5ad --frac results/tables/gse186344_neutrophil_lowDFM_fraction.tsv --out results/tables/gse186344_subpop_thbs1_assoc.tsv`
+- 蛋白/肽层（A3）
+  - python scripts/py/footprint_indices.py → results/tables/footprints.tsv
+  - python scripts/py/thbs1_cleavage_index.py → results/tables/thbs1_cleave_idx.tsv
+  - python scripts/py/serpin_scores.py → results/tables/serpin_scores.tsv
+  - python scripts/py/proteomics_deltafm_score.py → data/processed/proteomics/<dataset>/proteo_deltafm.tsv
+  - python scripts/py/isi_model.py → results/tables/isi_per_sample.tsv, isi_models.tsv
+  - python scripts/py/mnar_detection_model.py → results/tables/mnar_detection_table.tsv, mnar_logit_results.tsv
+  - python scripts/py/mixed_effects_a3.py → results/tables/mixed_effects_a3.tsv
+  - python scripts/py/mixed_effects_growth.py → results/tables/mixed_effects_growth.tsv（诊断与消息：mixed_effects_messages.txt）
+  - python scripts/py/prepare_sem_data.py；Rscript scripts/r/14_sem_model.R → sem_results.json, A3_sem_path.svg
+  - python scripts/py/robust_assoc.py → 生成稳健相关/分层关联汇总（如 assoc_summary.tsv 等）
+  - python scripts/py/neg_controls.py → results/tables/neg_controls.tsv, neg_controls_assoc.tsv（阴性/无关通路对照）
+  - （可选流程）python scripts/py/proteomics_pipeline.py（端到端 orchestrate：RAW→mzML→搜索→汇总→指标；按需使用）
 
-**Step 3｜环境建议（避免 NumPy ABI 冲突）**
-- 推荐使用 conda 环境（已提供锁定文件）：
-  - 创建：`conda env create -f env/environment-scrna.yml`
-  - 激活：`conda activate nets-scrna`
-  - 运行上述 Step 3 三个脚本
-- 如果使用 pip，请确保 NumPy<2 与相容版本：
-  - `pip install 'numpy<2' 'scanpy==1.9.8' 'anndata==0.9.2' 'pandas<2.2' 'numexpr<2.9' 'zarr<2.17' 'numcodecs<=0.12.1'`
+- 液体原型（CSF/Plasma）
+  - CSF：python scripts/py/site_triage_liquid.py --mode csf --dataset MSV000089062 --input-xlsx data/interim/proteomics/MSV000089062/metadata/vdac161_suppl_supplementary_table_s1.xlsx
+  - Plasma（单队列 MaxQuant）：python scripts/py/site_triage_liquid.py --mode maxquant --dataset PXD032767 --maxquant-dir data/interim/proteomics/PXD032767/txt --run-manifest data/interim/proteomics/PXD032767/metadata/run_manifest.tsv --clinical-xlsx data/interim/proteomics/PXD032767/metadata/vdac161_suppl_supplementary_table_s1.xlsx
+  - Plasma（跨队列）：python scripts/py/site_triage_liquid.py --mode plasma --dataset PXD032767 --maxquant-dir ... --run-manifest ... --clinical-xlsx ... --aux-dataset PXD018301 --aux-features data/processed/proteomics/PXD018301/csf_patient_features.tsv
+  - 图形产出：python scripts/py/plot_site_triage_figures.py → results/figures/site_triage_{roc,effects}.{pdf,png}
+  - （资源构建）Rscript scripts/r/01_build_net_m_v2.R、Rscript scripts/r/export_selected_sets.R（模块/通路资源；如需重建）
+  - （图像集）Rscript scripts/r/13_figures_a3.R（A3_forest/散点等发表图重绘）
+  - （外展）python scripts/py/met500_fetch.py、python scripts/py/site_triage_met500.py（MET500 侧验证与资源获取）
+
+## 8. 图与表（产出清单）
+
+- Bulk 主结果
+  - 图：results/figures/Figure2_GSE184869_Paired_DFM.pdf、results/figures/Figure3_GSE184869_THBS1_Residuals.pdf、results/figures/Figure4_FM_Corr_Overview.pdf、results/figures/Figure5_scRNA_LowDFM_Fraction.pdf
+  - 附：results/figures/Figure5_scRNA_THBS1_Assoc.txt（样本层相关因常量化未估计的说明记录）
+  - 表：results/tables/GSE184869_paired_tests.tsv、results/tables/GSE125989_paired_tests.tsv、results/tables/GSE184869_THBS1_residuals.tsv、results/tables/GSE184869_thbs1_partial_cor.tsv、results/tables/fm_correlation_overview.tsv、results/tables/gse186344_*.tsv
+
+- 蛋白/肽层与整合
+  - 图：results/figures/mixed_effects_diagnostics.pdf、results/figures/A3_sem_path.svg、results/figures/F_double_sandwich.pdf、results/figures/F_proteo_deltafm_boxplots.pdf、results/figures/F_proteo_deltafm_vs_transcriptome.pdf、results/figures/thbs1_spectrum_JIMT1_BR_R3.pdf、results/figures/A3_forest_assoc.pdf、results/figures/A3_scatter_serpin_vs_footprint.pdf、results/figures/A3_scatter_serpin_vs_ctrl_footprint.pdf、results/figures/A3_scatter_serpin_vs_deltaFM.pdf、results/figures/A3_scatter_serpin_vs_THBS1.pdf、results/figures/A3_scatter_serpin_vs_thbs1_cleave.pdf、results/figures/A3_scatter_serpin_vs_ecm_nc.pdf
+  - 表：results/tables/footprints.tsv、results/tables/thbs1_cleave_idx.tsv、results/tables/serpin_scores.tsv、data/processed/proteomics/*/proteo_deltafm.tsv、results/tables/proteo_deltafm_summary.tsv、results/tables/isi_per_sample.tsv、results/tables/isi_models.tsv、results/tables/mnar_detection_table.tsv、results/tables/mnar_logit_results.tsv、results/tables/assoc_summary.tsv、results/tables/mixed_effects_a3.tsv、results/tables/mixed_effects_growth.tsv、results/tables/mixed_effects_messages.txt、results/tables/multiomics_alignment.tsv、results/tables/multiomics_pairwise_deltas.tsv、results/tables/multilayer_sample_map.tsv、results/tables/multilayer_features.tsv、results/tables/proteomics_transcript_sample_map.tsv、results/tables/proteomics_transcript_matched.tsv、results/tables/proteomics_transcript_unmatched.tsv、results/tables/multiomics_correlations.tsv、results/tables/proteo_serpin_assoc.tsv、results/tables/proteo_module_detection_summary.tsv
+
+- 液体原型
+  - 图：results/figures/site_triage_roc.{pdf,png}、results/figures/site_triage_effects.{pdf,png}、results/figures/A4_site_triage_roc_calib_dca.pdf
+  - 表：results/tables/site_triage_metrics.tsv、results/tables/site_triage_predictions.tsv、results/tables/site_triage_coefficients.tsv、results/tables/site_triage_dca.tsv、results/tables/site_triage_dca_baseline.tsv、results/tables/site_triage_dca_serpin_extended.tsv、results/tables/site_triage_dca_null_inflammation.tsv、results/tables/site_triage_variant_metrics.tsv、results/tables/site_triage_variant_predictions.tsv、results/tables/site_triage_variant_coefficients.tsv、results/tables/msv000089062_csf_metrics.tsv、results/tables/msv000089062_csf_{roc,pr,calibration,dca}.tsv、results/tables/msv000089062_csf_{coefficients,scaler,spearman,predictions}.tsv、results/tables/pxd018301_csf_{metrics,roc,pr,calibration,coefficients,scaler,spearman,predictions}.tsv、results/tables/pxd018301_csf_{dca}.tsv、results/tables/pxd018301_csf_robust_logit.tsv、results/tables/pxd032767_liquid_{metrics,roc,pr,calibration,coefficients,scaler,predictions}.tsv、results/tables/pxd032767_liquid_{dca,spearman}.tsv、results/tables/pxd032767_liquid_{model,robust_logit}.tsv、results/tables/pzd032767_model_summary.tsv、results/tables/pxd032767_pxd018301_plasma_{metrics,roc,pr,calibration,predictions,coefficients,scaler,spearman}.tsv、results/tables/pxd032767_pxd018301_plasma_{robust_logit,mixed_effects}.tsv、results/tables/pxd032767_pxd018301_plasma_{dca}.tsv
+
+- 其它图（示意/机制/总览）
+  - 图：results/figures/Figure1_DFM_Schematic.pdf、results/figures/Figure6_Mechanism_Model.pdf
+
+- 负/正对照与模块
+  - 表：results/tables/neg_controls.tsv、results/tables/neg_controls_assoc.tsv、results/tables/module_scores.tsv、results/tables/module_assoc.tsv、results/tables/bulk_paired_tests.tsv、results/tables/GSE*_deltafm_scores.tsv
+
+## 9. 下一步（两周可交付最小集）
+
+- ISI（core/扩展）＋ 器官交互，导出森林图。
+- Logit/零膨胀：F 检出 ~ Serpin（M 作阴性对照），汇总跨队列元分析。
+- 底物足迹与 THBS1 裂解：指数与 Serpin/Proteo‑ΔFM 关联的稳健估计与可视化。
+- 液体原型图：CSF/Plasma ROC 与效应量一页式整合；脑 vs 非脑 机制总图更新。
+
+——
+
+注：本 README 覆盖 `README_proteo_metab.md` 中的全部脚本、图表与失败记录。历史长文档仍保留为参考。
