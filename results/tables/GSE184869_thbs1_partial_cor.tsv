@@ -1,0 +1,3 @@
+dataset	method	target	r	p	n	neutrophil_source	purity_source	fdr
+GSE184869	singscore	THBS1	-0.146660081491542	0.167504301621057	90	Proxy:marker_score	Proxy:marker_score	0.225415020897132
+GSE184869	ssgsea	THBS1	-0.128929497468823	0.225415020897132	90	Proxy:marker_score	Proxy:marker_score	0.225415020897132

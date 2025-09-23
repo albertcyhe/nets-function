@@ -1,0 +1,5 @@
+endpoint	term	estimate	se	z	p_value	n	error	expect
+footprint_index	model_error					25	Singular matrix	
+THBS1_log_count	Serpin_score_core	0.027526229706018906				25		pos
+THBS1_log_count	log_total_PSMs	0.0009853934364343548	0.0011808207352969609	0.8344987574989876	0.40399998722870256	25		pos
+THBS1_log_count	Intercept	1.1255561668121026				25		pos

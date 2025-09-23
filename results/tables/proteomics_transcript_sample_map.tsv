@@ -1,0 +1,40 @@
+dataset	proteomics_sample	candidate_transcript_sample	notes	condition	stimulus_or_compartment	time_or_replicate
+PXD011796	DS_181017_RA023_A23_1h	RA023_A23	Condition RA, patient 023, stimulus A23, 1h	RA	A23	1h
+PXD011796	DS_181017_RA026_A23_1h	RA026_A23	Condition RA, patient 026, stimulus A23, 1h	RA	A23	1h
+PXD011796	DS_181017_SLE01_PMA_1h	SLE01_PMA	Condition SLE, patient 01, stimulus PMA, 1h	SLE	PMA	1h
+PXD011796	DS_181017_SLE04_A23_1h	SLE04_A23	Condition SLE, patient 04, stimulus A23, 1h	SLE	A23	1h
+PXD011796	DS_181017_SLE06_A23_1h	SLE06_A23	Condition SLE, patient 06, stimulus A23, 1h	SLE	A23	1h
+PXD011796	DS_181017_media_Rep3_1h	Media_REP3	Condition M, patient edia, stimulus REP3, 1h	M	REP3	1h
+PXD011796	DS_200417_A23187_NC16_1h	A23187_NC16	Condition A, patient 23187, stimulus NC16, 1h	A	NC16	1h
+PXD011796	Ds_181017_RA023_PMA_1h	RA023_PMA	Condition RA, patient 023, stimulus PMA, 1h	RA	PMA	1h
+PXD011796	Ds_181017_SLE02_PMA_1h	SLE02_PMA	Condition SLE, patient 02, stimulus PMA, 1h	SLE	PMA	1h
+PXD046330	SKBR3_Cyto_control_12	GSE96860:SKBR3_Untreated	SKBR3 Cyto control replicate 12; mapped to SKBR3 RNA-seq (GSE96860)	SKBR3_Cyto	CONTROL	12
+PXD046330	SKBR3_Cyto_control_21	GSE96860:SKBR3_Untreated	SKBR3 Cyto control replicate 21; mapped to SKBR3 RNA-seq (GSE96860)	SKBR3_Cyto	CONTROL	21
+PXD046330	SKBR3_Cyto_control_23	GSE96860:SKBR3_Untreated	SKBR3 Cyto control replicate 23; mapped to SKBR3 RNA-seq (GSE96860)	SKBR3_Cyto	CONTROL	23
+PXD046330	SKBR3_Cyto_control_32	GSE96860:SKBR3_Untreated	SKBR3 Cyto control replicate 32; mapped to SKBR3 RNA-seq (GSE96860)	SKBR3_Cyto	CONTROL	32
+PXD046330	SKBR3_Cyto_treatement_11	GSE96860:SKBR3_Untreated	SKBR3 Cyto treatement replicate 11; mapped to SKBR3 RNA-seq (GSE96860)	SKBR3_Cyto	TREATEMENT	11
+PXD046330	SKBR3_Cyto_treatement_13	GSE96860:SKBR3_Untreated	SKBR3 Cyto treatement replicate 13; mapped to SKBR3 RNA-seq (GSE96860)	SKBR3_Cyto	TREATEMENT	13
+PXD046330	SKBR3_Cyto_treatement_22	GSE96860:SKBR3_Untreated	SKBR3 Cyto treatement replicate 22; mapped to SKBR3 RNA-seq (GSE96860)	SKBR3_Cyto	TREATEMENT	22
+PXD046330	SKBR3_Cyto_treatement_31	GSE96860:SKBR3_Untreated	SKBR3 Cyto treatement replicate 31; mapped to SKBR3 RNA-seq (GSE96860)	SKBR3_Cyto	TREATEMENT	31
+PXD046330	SKBR3_Cyto_treatement_33	GSE96860:SKBR3_Untreated	SKBR3 Cyto treatement replicate 33; mapped to SKBR3 RNA-seq (GSE96860)	SKBR3_Cyto	TREATEMENT	33
+PXD046330	SKBR3_Nucl_control_12	GSE96860:SKBR3_Untreated	SKBR3 Nucl control replicate 12; mapped to SKBR3 RNA-seq (GSE96860)	SKBR3_Nucl	CONTROL	12
+PXD046330	SKBR3_Nucl_control_21	GSE96860:SKBR3_Untreated	SKBR3 Nucl control replicate 21; mapped to SKBR3 RNA-seq (GSE96860)	SKBR3_Nucl	CONTROL	21
+PXD046330	SKBR3_Nucl_control_23	GSE96860:SKBR3_Untreated	SKBR3 Nucl control replicate 23; mapped to SKBR3 RNA-seq (GSE96860)	SKBR3_Nucl	CONTROL	23
+PXD046330	SKBR3_Nucl_control_32	GSE96860:SKBR3_Untreated	SKBR3 Nucl control replicate 32; mapped to SKBR3 RNA-seq (GSE96860)	SKBR3_Nucl	CONTROL	32
+PXD046330	SKBR3_Nucl_treatement_11	GSE96860:SKBR3_Untreated	SKBR3 Nucl treatement replicate 11; mapped to SKBR3 RNA-seq (GSE96860)	SKBR3_Nucl	TREATEMENT	11
+PXD046330	SKBR3_Nucl_treatement_13	GSE96860:SKBR3_Untreated	SKBR3 Nucl treatement replicate 13; mapped to SKBR3 RNA-seq (GSE96860)	SKBR3_Nucl	TREATEMENT	13
+PXD046330	SKBR3_Nucl_treatement_22	GSE96860:SKBR3_Untreated	SKBR3 Nucl treatement replicate 22; mapped to SKBR3 RNA-seq (GSE96860)	SKBR3_Nucl	TREATEMENT	22
+PXD046330	SKBR3_Nucl_treatement_31	GSE96860:SKBR3_Untreated	SKBR3 Nucl treatement replicate 31; mapped to SKBR3 RNA-seq (GSE96860)	SKBR3_Nucl	TREATEMENT	31
+PXD046330	SKBR3_Nucl_treatement_33	GSE96860:SKBR3_Untreated	SKBR3 Nucl treatement replicate 33; mapped to SKBR3 RNA-seq (GSE96860)	SKBR3_Nucl	TREATEMENT	33
+PXD051579	JIMT1_BR_R1	JIMT1_BR	Cell line JIMT1, compartment BR, replicate R1	JIMT1	BR	R1
+PXD051579	JIMT1_BR_R3	JIMT1_BR	Cell line JIMT1, compartment BR, replicate R3	JIMT1	BR	R3
+PXD051579	SUM190_BR_R1	SUM190_BR	Cell line SUM190, compartment BR, replicate R1	SUM190	BR	R1
+PXD051579	SUM190_BR_R3	SUM190_BR	Cell line SUM190, compartment BR, replicate R3	SUM190	BR	R3
+PXD051579	SUM190_P_R2	SUM190_P	Cell line SUM190, compartment P, replicate R2	SUM190	P	R2
+PXD051579	SUM190_P_R3	SUM190_P	Cell line SUM190, compartment P, replicate R3	SUM190	P	R3
+PXD005719	YSM_20150522_CLM_231_01	GSE12237:GSM307534	MDA-MB-231 parental	MDA-MB-231	NA	01
+PXD005719	YSM_20150522_CLM_231_02	GSE12237:GSM307535	MDA-MB-231 parental	MDA-MB-231	NA	02
+PXD005719	YSM_20150522_CLM_231_03	GSE12237:GSM307536	MDA-MB-231 parental	MDA-MB-231	NA	03
+PXD005719	YSM_20150522_CLM_231BR_01	GSE12237:GSM307577	MDA-MB-231 brain metastatic variant	MDA-MB-231	NA	01
+PXD005719	YSM_20150522_CLM_231BR_02	GSE12237:GSM307578	MDA-MB-231 brain metastatic variant	MDA-MB-231	NA	02
+PXD005719	YSM_20150522_CLM_231BR_03	GSE12237:GSM307579	MDA-MB-231 brain metastatic variant	MDA-MB-231	NA	03

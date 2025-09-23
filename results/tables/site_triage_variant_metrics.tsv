@@ -1,0 +1,16 @@
+variant	variant_label	metric	value	delta_vs_baseline
+baseline	Core serpins + IL6/CoOption	roc_auc	0.85108715512516	0.0
+baseline	Core serpins + IL6/CoOption	average_precision	0.5435903207605987	0.0
+baseline	Core serpins + IL6/CoOption	brier_score	0.018617409347123148	0.0
+baseline	Core serpins + IL6/CoOption	sensitivity@0.5	0.38461538461538464	0.0
+baseline	Core serpins + IL6/CoOption	specificity@0.5	0.995249406175772	0.0
+serpin_extended	Extended serpins (+SERPINB/SLPI/A2M)	roc_auc	0.847432852183446	-0.0036543029417139827
+serpin_extended	Extended serpins (+SERPINB/SLPI/A2M)	average_precision	0.5350069918979531	-0.008583328862645567
+serpin_extended	Extended serpins (+SERPINB/SLPI/A2M)	brier_score	0.018637872201962495	2.0462854839347483e-05
+serpin_extended	Extended serpins (+SERPINB/SLPI/A2M)	sensitivity@0.5	0.34615384615384615	-0.03846153846153849
+serpin_extended	Extended serpins (+SERPINB/SLPI/A2M)	specificity@0.5	0.996437054631829	0.001187648456057011
+null_inflammation	Null inflammatory proxies (ribosomal/glycolytic)	roc_auc	0.5889365978439614	-0.2621505572811986
+null_inflammation	Null inflammatory proxies (ribosomal/glycolytic)	average_precision	0.058411148767804885	-0.48517917199279376
+null_inflammation	Null inflammatory proxies (ribosomal/glycolytic)	brier_score	0.028985601879020627	0.01036819253189748
+null_inflammation	Null inflammatory proxies (ribosomal/glycolytic)	sensitivity@0.5	0.0	-0.38461538461538464
+null_inflammation	Null inflammatory proxies (ribosomal/glycolytic)	specificity@0.5	1.0	0.004750593824228044

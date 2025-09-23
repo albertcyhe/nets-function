@@ -1,0 +1,2 @@
+dataset	method	n	statistic	p_value	cliff_delta	fdr
+GSE184869	delta_singscore	34	3	1.1099335898158979e-6	-0.7889273356401384	1.1099335898158979e-6

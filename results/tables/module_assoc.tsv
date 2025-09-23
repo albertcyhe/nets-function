@@ -1,0 +1,37 @@
+module	endpoint	stratum	rho	p_value	n
+E2F_G2M_score	footprint_index	Brain			1
+E2F_G2M_score	footprint_index	NonBrain	-0.1753091763738563	0.36302602670405837	29
+E2F_G2M_score	footprint_index	Combined	-0.16923118988577113	0.3713198339189667	30
+E2F_G2M_score	THBS1_cleave_idx	Brain			0
+E2F_G2M_score	THBS1_cleave_idx	NonBrain	0.6	0.20799999999999982	6
+E2F_G2M_score	THBS1_cleave_idx	Combined	0.6	0.20799999999999982	6
+E2F_G2M_score	THBS1_log_count	Brain			1
+E2F_G2M_score	THBS1_log_count	NonBrain	-0.0015058355781836553	0.9938144963584692	29
+E2F_G2M_score	THBS1_log_count	Combined	-0.023928610875494572	0.9001189537920128	30
+E2F_G2M_score	Proteo_DeltaFM	Brain			0
+E2F_G2M_score	Proteo_DeltaFM	NonBrain	-0.5519703283018984	0.0051669447992041505	24
+E2F_G2M_score	Proteo_DeltaFM	Combined	-0.5519703283018984	0.0051669447992041505	24
+IL6_STAT3_score	footprint_index	Brain			1
+IL6_STAT3_score	footprint_index	NonBrain	-0.018271660636148407	0.9250492843387905	29
+IL6_STAT3_score	footprint_index	Combined	0.0033444899186911296	0.9860057021913224	30
+IL6_STAT3_score	THBS1_cleave_idx	Brain			0
+IL6_STAT3_score	THBS1_cleave_idx	NonBrain	0.08571428571428573	0.8717434402332361	6
+IL6_STAT3_score	THBS1_cleave_idx	Combined	0.08571428571428573	0.8717434402332361	6
+IL6_STAT3_score	THBS1_log_count	Brain			1
+IL6_STAT3_score	THBS1_log_count	NonBrain	-0.37947056570228116	0.04232840406035062	29
+IL6_STAT3_score	THBS1_log_count	Combined	-0.38175760799064906	0.03736926226205384	30
+IL6_STAT3_score	Proteo_DeltaFM	Brain			0
+IL6_STAT3_score	Proteo_DeltaFM	NonBrain	0.02969460626940593	0.890448034256973	24
+IL6_STAT3_score	Proteo_DeltaFM	Combined	0.02969460626940593	0.890448034256973	24
+CoOption_score	footprint_index	Brain			1
+CoOption_score	footprint_index	NonBrain	-0.6029648009928974	0.0005362161554211139	29
+CoOption_score	footprint_index	Combined	-0.6240818188277648	0.0002283671054476872	30
+CoOption_score	THBS1_cleave_idx	Brain			0
+CoOption_score	THBS1_cleave_idx	NonBrain	0.7714285714285715	0.07239650145772594	6
+CoOption_score	THBS1_cleave_idx	Combined	0.7714285714285715	0.07239650145772594	6
+CoOption_score	THBS1_log_count	Brain			1
+CoOption_score	THBS1_log_count	NonBrain	0.6020330641578254	0.0005498495168224813	29
+CoOption_score	THBS1_log_count	Combined	0.5550337557097478	0.0014552378828912632	30
+CoOption_score	Proteo_DeltaFM	Brain			0
+CoOption_score	Proteo_DeltaFM	NonBrain	0.04279516785884973	0.8426138816906992	24
+CoOption_score	Proteo_DeltaFM	Combined	0.04279516785884973	0.8426138816906992	24

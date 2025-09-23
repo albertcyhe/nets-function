@@ -113,7 +113,6 @@ GPL*.annot.gz
 /raw/
 /inputs/
 /outputs/
-/results/
 /cache/
 /tmp/
 /logs/

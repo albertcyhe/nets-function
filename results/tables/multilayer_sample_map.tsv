@@ -1,0 +1,40 @@
+dataset	proteomics_sample	transcript_sample	organ	condition	stimulus_or_compartment	time_or_replicate	available_layers
+PXD011796	DS_181017_RA023_A23_1h	RA023_A23	NonBrain	RA	A23	1h	Proteome+Transcript
+PXD011796	DS_181017_RA026_A23_1h	RA026_A23	NonBrain	RA	A23	1h	Proteome+Transcript
+PXD011796	DS_181017_SLE01_PMA_1h	SLE01_PMA	NonBrain	SLE	PMA	1h	Proteome+Transcript
+PXD011796	DS_181017_SLE04_A23_1h	SLE04_A23	NonBrain	SLE	A23	1h	Proteome+Transcript
+PXD011796	DS_181017_SLE06_A23_1h	SLE06_A23	NonBrain	SLE	A23	1h	Proteome+Transcript
+PXD011796	DS_181017_media_Rep3_1h	Media_REP3	NonBrain	M	REP3	1h	Proteome+Transcript
+PXD011796	DS_200417_A23187_NC16_1h	A23187_NC16	NonBrain	A	NC16	1h	Proteome+Transcript
+PXD011796	Ds_181017_RA023_PMA_1h	RA023_PMA	NonBrain	RA	PMA	1h	Proteome+Transcript
+PXD011796	Ds_181017_SLE02_PMA_1h	SLE02_PMA	NonBrain	SLE	PMA	1h	Proteome+Transcript
+PXD046330	SKBR3_Cyto_control_12	GSE96860:SKBR3_Untreated	NonBrain	SKBR3_Cyto	CONTROL	12	Proteome+Transcript
+PXD046330	SKBR3_Cyto_control_21	GSE96860:SKBR3_Untreated	NonBrain	SKBR3_Cyto	CONTROL	21	Proteome+Transcript
+PXD046330	SKBR3_Cyto_control_23	GSE96860:SKBR3_Untreated	NonBrain	SKBR3_Cyto	CONTROL	23	Proteome+Transcript
+PXD046330	SKBR3_Cyto_control_32	GSE96860:SKBR3_Untreated	NonBrain	SKBR3_Cyto	CONTROL	32	Proteome+Transcript
+PXD046330	SKBR3_Cyto_treatement_11	GSE96860:SKBR3_Untreated	NonBrain	SKBR3_Cyto	TREATEMENT	11	Proteome+Transcript
+PXD046330	SKBR3_Cyto_treatement_13	GSE96860:SKBR3_Untreated	NonBrain	SKBR3_Cyto	TREATEMENT	13	Proteome+Transcript
+PXD046330	SKBR3_Cyto_treatement_22	GSE96860:SKBR3_Untreated	NonBrain	SKBR3_Cyto	TREATEMENT	22	Proteome+Transcript
+PXD046330	SKBR3_Cyto_treatement_31	GSE96860:SKBR3_Untreated	NonBrain	SKBR3_Cyto	TREATEMENT	31	Proteome+Transcript
+PXD046330	SKBR3_Cyto_treatement_33	GSE96860:SKBR3_Untreated	NonBrain	SKBR3_Cyto	TREATEMENT	33	Proteome+Transcript
+PXD046330	SKBR3_Nucl_control_12	GSE96860:SKBR3_Untreated	NonBrain	SKBR3_Nucl	CONTROL	12	Proteome+Transcript
+PXD046330	SKBR3_Nucl_control_21	GSE96860:SKBR3_Untreated	NonBrain	SKBR3_Nucl	CONTROL	21	Proteome+Transcript
+PXD046330	SKBR3_Nucl_control_23	GSE96860:SKBR3_Untreated	NonBrain	SKBR3_Nucl	CONTROL	23	Proteome+Transcript
+PXD046330	SKBR3_Nucl_control_32	GSE96860:SKBR3_Untreated	NonBrain	SKBR3_Nucl	CONTROL	32	Proteome+Transcript
+PXD046330	SKBR3_Nucl_treatement_11	GSE96860:SKBR3_Untreated	NonBrain	SKBR3_Nucl	TREATEMENT	11	Proteome+Transcript
+PXD046330	SKBR3_Nucl_treatement_13	GSE96860:SKBR3_Untreated	NonBrain	SKBR3_Nucl	TREATEMENT	13	Proteome+Transcript
+PXD046330	SKBR3_Nucl_treatement_22	GSE96860:SKBR3_Untreated	NonBrain	SKBR3_Nucl	TREATEMENT	22	Proteome+Transcript
+PXD046330	SKBR3_Nucl_treatement_31	GSE96860:SKBR3_Untreated	NonBrain	SKBR3_Nucl	TREATEMENT	31	Proteome+Transcript
+PXD046330	SKBR3_Nucl_treatement_33	GSE96860:SKBR3_Untreated	NonBrain	SKBR3_Nucl	TREATEMENT	33	Proteome+Transcript
+PXD051579	JIMT1_BR_R1	JIMT1_BR	NonBrain	JIMT1	BR	R1	Proteome+Transcript
+PXD051579	JIMT1_BR_R3	JIMT1_BR	NonBrain	JIMT1	BR	R3	Proteome+Transcript
+PXD051579	SUM190_BR_R1	SUM190_BR	NonBrain	SUM190	BR	R1	Proteome+Transcript
+PXD051579	SUM190_BR_R3	SUM190_BR	NonBrain	SUM190	BR	R3	Proteome+Transcript
+PXD051579	SUM190_P_R2	SUM190_P	NonBrain	SUM190	P	R2	Proteome+Transcript
+PXD051579	SUM190_P_R3	SUM190_P	NonBrain	SUM190	P	R3	Proteome+Transcript
+PXD005719	YSM_20150522_CLM_231_01	GSE12237:GSM307534	NonBrain	MDA-MB-231		01	Proteome+Transcript
+PXD005719	YSM_20150522_CLM_231_02	GSE12237:GSM307535	NonBrain	MDA-MB-231		02	Proteome+Transcript
+PXD005719	YSM_20150522_CLM_231_03	GSE12237:GSM307536	NonBrain	MDA-MB-231		03	Proteome+Transcript
+PXD005719	YSM_20150522_CLM_231BR_01	GSE12237:GSM307577	Brain	MDA-MB-231		01	Proteome+Transcript
+PXD005719	YSM_20150522_CLM_231BR_02	GSE12237:GSM307578	Brain	MDA-MB-231		02	Proteome+Transcript
+PXD005719	YSM_20150522_CLM_231BR_03	GSE12237:GSM307579	Brain	MDA-MB-231		03	Proteome+Transcript

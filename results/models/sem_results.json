@@ -1,0 +1,180 @@
+{
+  "parameters": [
+    {
+      "lhs": "F_latent",
+      "op": "=~",
+      "rhs": "footprint_index_z",
+      "label": "",
+      "est": 1,
+      "se": 0,
+      "ci.lower": 1,
+      "ci.upper": 1,
+      "std.lv": 0.9159,
+      "std.all": 1.0033,
+      "std.nox": 1.0033
+    },
+    {
+      "lhs": "F_latent",
+      "op": "=~",
+      "rhs": "THBS1_cleave_idx_z",
+      "label": "",
+      "est": -0.8998,
+      "std.lv": -0.8242,
+      "std.all": -0.9028,
+      "std.nox": -0.9028
+    },
+    {
+      "lhs": "F_latent",
+      "op": "=~",
+      "rhs": "Proteo_DeltaFM_z",
+      "label": "",
+      "est": 0,
+      "std.lv": 0,
+      "std.all": 0,
+      "std.nox": 0
+    },
+    {
+      "lhs": "Proteo_DeltaFM_z",
+      "op": "~",
+      "rhs": "F_latent",
+      "label": "b1",
+      "est": 0.6942,
+      "std.lv": 0.6358,
+      "std.all": 0.6965,
+      "std.nox": 0.6965
+    },
+    {
+      "lhs": "F_latent",
+      "op": "~",
+      "rhs": "Serpin_score_core_z",
+      "label": "a1",
+      "est": 0.993,
+      "std.lv": 1.0841,
+      "std.all": 0.9897,
+      "std.nox": 1.0841
+    },
+    {
+      "lhs": "footprint_index_z",
+      "op": "~~",
+      "rhs": "footprint_index_z",
+      "label": "",
+      "est": -0.0056,
+      "std.lv": -0.0056,
+      "std.all": -0.0067,
+      "std.nox": -0.0067
+    },
+    {
+      "lhs": "THBS1_cleave_idx_z",
+      "op": "~~",
+      "rhs": "THBS1_cleave_idx_z",
+      "label": "",
+      "est": 0.1541,
+      "std.lv": 0.1541,
+      "std.all": 0.1849,
+      "std.nox": 0.1849
+    },
+    {
+      "lhs": "Proteo_DeltaFM_z",
+      "op": "~~",
+      "rhs": "Proteo_DeltaFM_z",
+      "label": "",
+      "est": 0.429,
+      "std.lv": 0.429,
+      "std.all": 0.5148,
+      "std.nox": 0.5148
+    },
+    {
+      "lhs": "F_latent",
+      "op": "~~",
+      "rhs": "F_latent",
+      "label": "",
+      "est": 0.0173,
+      "std.lv": 0.0206,
+      "std.all": 0.0206,
+      "std.nox": 0.0206
+    },
+    {
+      "lhs": "Serpin_score_core_z",
+      "op": "~~",
+      "rhs": "Serpin_score_core_z",
+      "label": "",
+      "est": 0.8333,
+      "se": 0,
+      "ci.lower": 0.8333,
+      "ci.upper": 0.8333,
+      "std.lv": 0.8333,
+      "std.all": 1,
+      "std.nox": 0.8333
+    },
+    {
+      "lhs": "footprint_index_z",
+      "op": "~1",
+      "rhs": "",
+      "label": "",
+      "est": 7.4081e-09,
+      "std.lv": 7.4081e-09,
+      "std.all": 8.1151e-09,
+      "std.nox": 8.1151e-09
+    },
+    {
+      "lhs": "THBS1_cleave_idx_z",
+      "op": "~1",
+      "rhs": "",
+      "label": "",
+      "est": 1.0621e-07,
+      "std.lv": 1.0621e-07,
+      "std.all": 1.1634e-07,
+      "std.nox": 1.1634e-07
+    },
+    {
+      "lhs": "Proteo_DeltaFM_z",
+      "op": "~1",
+      "rhs": "",
+      "label": "",
+      "est": 3.3556e-09,
+      "std.lv": 3.3556e-09,
+      "std.all": 3.6759e-09,
+      "std.nox": 3.6759e-09
+    },
+    {
+      "lhs": "Serpin_score_core_z",
+      "op": "~1",
+      "rhs": "",
+      "label": "",
+      "est": 2.313e-18,
+      "se": 0,
+      "ci.lower": 2.313e-18,
+      "ci.upper": 2.313e-18,
+      "std.lv": 2.313e-18,
+      "std.all": 2.5337e-18,
+      "std.nox": 2.313e-18
+    },
+    {
+      "lhs": "F_latent",
+      "op": "~1",
+      "rhs": "",
+      "label": "",
+      "est": 0,
+      "se": 0,
+      "ci.lower": 0,
+      "ci.upper": 0,
+      "std.lv": 0,
+      "std.all": 0,
+      "std.nox": 0
+    },
+    {
+      "lhs": "ind_effect",
+      "op": ":=",
+      "rhs": "a1*b1",
+      "label": "ind_effect",
+      "est": 0.6893,
+      "se": 0,
+      "ci.lower": 0.6893,
+      "ci.upper": 0.6893,
+      "std.lv": 0.6893,
+      "std.all": 0.6893,
+      "std.nox": 0.7551
+    }
+  ],
+  "fit": [0.8638, 0.1828, 0.9595, 0.0487]
+}
