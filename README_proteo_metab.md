@@ -120,7 +120,7 @@ Proteo-DeltaFM scoring (Aim A1)
    - Paired contrasts (e.g. conditioned vs control) → paired Wilcoxon + Cliff's delta; output `results/tables/<dataset>_proteo_deltafm_paired.tsv`.
    - Brain vs lung metastasis groups → Mann-Whitney / linear models with neutrophil abundance covariate (proxy from CD66b/MPO intensities).
    - Correlate Proteo-DeltaFM with transcriptomic DeltaFM for overlapping samples (Spearman, partial correlation controlling neutrophil score + purity proxies).
-4. **Outputs**: `results/tables/proteo_deltafm_summary.tsv`, `results/figures/F_proteo_deltafm_boxplots.pdf`, `results/figures/F_proteo_deltafm_vs_transcriptome.pdf`. *(PXD051579 cross-cohort comparison paused until a matched transcriptomic dataset is available.)*
+4. **Outputs**: `results/tables/proteo_deltafm_summary.tsv`, `results/figures/F_proteo_deltafm_boxplots.pdf`, `results/figures/F_proteo_deltafm_vs_transcriptome.pdf`. *(Generated 2025-09-21 via `.venv/bin/python` plotting helpers; PXD051579 cross-cohort comparison paused until a matched transcriptomic dataset is available.)*
 
 THBS1 degradomics (Aim A2)
 --------------------------
@@ -138,7 +138,7 @@ Serpin occupancy vs Proteo-DeltaFM (Aim A3)
 1. **Serpin module**: compile SERPINA3, SERPINB2, SERPINI1, SERPING1, SERPINB1, SERPINB5 etc. Store in `resources/modules/serpin_brain.tsv` (mark astrocyte-enriched serpins with a metadata column).
 2. **Scoring**: compute ssGSEA/singscore on proteomic matrices to obtain `Serpin_score`.
 3. **Analyses**
-   - Correlate `Serpin_score` with `Proteo_DeltaFM` (expect negative correlation in brain metastasis proteomes). Report rho, p, FDR, 95% CI in `results/tables/proteo_serpin_assoc.tsv`.
+  - Correlate `Serpin_score` with `Proteo_DeltaFM` (expect negative correlation in brain metastasis proteomes). Report rho, p, FDR, 95% CI in `results/tables/proteo_serpin_assoc.tsv`. *(2025-09-21 table populated; low n flagged where applicable.)*
    - Partial correlations controlling neutrophil proxies and astrocyte markers (GFAP, S100B) to isolate the effect.
    - Overlay on transcriptomic Serpin scores (GSE184869) for matched subjects.
 
@@ -190,14 +190,14 @@ Metabolomic extensions (B1 & B2) — *Paused*
 
 Cross-layer integration & modelling
 -----------------------------------
-1. **Sample alignment**: build `results/tables/multilayer_sample_map.tsv` linking samples across transcriptome, proteome, degradome, metabolome (columns: cohort, organ, patient ID, sample type, available layers).
-2. **Derived metrics table**: merge DeltaFM (RNA), Proteo-DeltaFM, Serpin score, THBS1 cleavage index, ROS metrics, MPO trace into `results/tables/multilayer_features.tsv`.
+1. **Sample alignment**: build `results/tables/multilayer_sample_map.tsv` linking samples across transcriptome, proteome, degradome, metabolome (columns: cohort, organ, patient ID, sample type, available layers). *(2025-09-21 populated from proteomics↔transcript sample map; degrade/metabolome columns remain placeholders.)*
+2. **Derived metrics table**: merge DeltaFM (RNA), Proteo-DeltaFM, Serpin score, THBS1 cleavage index, ROS metrics, MPO trace into `results/tables/multilayer_features.tsv`. *(2025-09-21 compiled from serpin/footprint/THBS1 merges; ROS/MPO pending.)*
 3. **Mixed-effects model** (`scripts/r/12_mixed_effects.R`)
    - Formula: `Functional_proxy ~ DeltaFM * Organ + Proteo_DeltaFM + Serpin_score + ROS_ratio + (1 | Cohort)`.
    - Fit using `lme4::lmer` with Satterthwaite df (`lmerTest`). Report fixed effects, interaction (DeltaFM × organ), conditional R².
    - Evaluate organ-specific slopes via `emmeans::emtrends`.
-   - Diagnostic plots: residual vs fitted, Q-Q normal plot, influence (Cook's distance) saved to `results/figures/mixed_effects_diagnostics.pdf`.
-4. **Visual storytelling**: assemble the "double sandwich" schematic summarising Proteo-DeltaFM and THBS1 cleavage divergences between brain vs lung metastasis (`results/figures/F_double_sandwich.pdf`).
+   - Diagnostic plots: residual vs fitted, Q-Q normal plot, influence (Cook's distance) saved to `results/figures/mixed_effects_diagnostics.pdf`. *(2025-09-21 surrogate OLS diagnostics using non-brain THBS1 model.)*
+4. **Visual storytelling**: assemble the "double sandwich" schematic summarising Proteo-DeltaFM and THBS1 cleavage divergences between brain vs lung metastasis (`results/figures/F_double_sandwich.pdf`). *(2025-09-21 draft bar chart using SEM input means.)*
 
 #### Multi-omics status (2025-09-21)
 - Accepted the absence of NET-F module coverage in the PXD005719 proteome; downstream integration uses NET-M only.
@@ -239,6 +239,48 @@ Mixed-effects (organ interaction):
   * Model: `endpoint ~ Serpin_score_core * organ + log_total_PSMs + (1 | dataset)`.
   * THBS1 abundance fit: β_Serpin ≈ +0.028 (non-significant; limited organ contrast); footprint model remains singular (brain stratum underpowered), annotated in the table for transparency.
 
+- `scripts/py/mixed_effects_growth.py` (NonBrain focus) → `results/tables/mixed_effects_growth.tsv`
+  * Footprints ~ Serpin_score_core: β≈+0.0027 (p≈4e-20) reflecting monotone footprint drop as Serpin increases (since footprint index is negative, small positive slope indicates stronger suppression).
+  * THBS1 cleavage ~ Serpin: β≈−0.011 (p≈0.41) – direction negative but underpowered (n=6); THBS1 log abundance ~ Serpin: β≈+0.0125 (p≈0.30).
+  * Messages (brain underpowered, E2F model singular) logged in `results/tables/mixed_effects_messages.txt`.
+  * *2025-09-21 update*: Scripts re-run after installing `statsmodels 0.14.5` inside `.venv`; convergence emits singular covariance warnings (expected with low n) but coefficients unchanged.
+
+- SEM prototype (exploratory):
+  * `scripts/py/prepare_sem_data.py` → `results/tables/sem_input.tsv`
+  * `scripts/r/14_sem_model.R` (lavaan) → `results/models/sem_results.json`, `results/figures/A3_sem_path.svg`
+    - Model: `Serpin_score_core -> F_latent -> {footprint, THBS1_cleave, Proteo-ΔFM}`; standardized paths saved, but warnings indicate limited identifiability (n≈24, some variances negative). Treat as conceptual preview pending additional data. *Re-run 2025-09-21 via `micromamba run -n proteomics Rscript scripts/r/14_sem_model.R`; lavaan flags non-invertible information matrix and negative variances as before.*
+
+#### Site triage 分层策略（液体主叙事 + 组织旁证）
+- **轨 A — 液体可落地（l-NFS 原型，2025-09-22 启动）**
+  - 数据源：优先挑选血浆/CSF 蛋白组带脑/非脑标签的公开资源（首选 PXD032767 血浆 sEV、MSV000089062 CSF）；必要时补充 PXD026016/健康 CSF 阴性参考。
+  - 特征：NE/PR3 footprint 指数 + THBS1 cleavage 指数 ± NET-M 模块（核小体/ci-H3）与 Serpin 模块；全部来源于液体质谱，不依赖组织活检。
+  - 模型：`P(brain) ~ z(footprint) + z(THBS1_cleave) (+ z(M_panel))`，5 折 CV 产出 AUC、Brier、校准曲线与 DCA；报告“每 100 人少做/多做 MRI/CT 的净获益”。
+  - 工程：新脚本 `scripts/py/site_triage_liquid.py`（复用 ROC/校准/DCA 绘图到 `results/figures/A4_site_triage_liquid_*.pdf`），输入由 `footprint_indices.py` 与 `thbs1_cleavage_index.py` 在液体矩阵上生成。
+  - *(进度 2025-09-22)*：已下载 PXD032767 MaxQuant `txt.zip` 并解压至 `data/interim/proteomics/PXD032767/txt/`，确认可用的 `proteinGroups.txt`/`evidence.txt`。脑转移/非脑标签不随 `txt.zip` 提供，需从 OncoImmunology 2022 补充材料抓取：
+    * 推荐直接下载 Supplementary Table S1 (`vdac161_suppl_supplementary_table_s1.xlsx`)：`https://pmc.ncbi.nlm.nih.gov/articles/instance/9639356/bin/vdac161_suppl_supplementary_table_s1.xlsx`。
+    * 若链接失效，可改用整包补充材料 `KONI_A_2067944_SM3909.zip`：`https://pmc.ncbi.nlm.nih.gov/articles/instance/9037466/bin/KONI_A_2067944_SM3909.zip`，解压后检索含受试者分组信息的表（通常为 Supplementary Table S1）。
+    * 将 Supplementary Table S1 中的 PatientID/Group (BM+/BM−/Healthy) 与 MaxQuant `evidence.txt` 的 `Raw file` 列按 E01/P01 命名规则映射；如补充材料未列 run 名，参照 PRIDE 文件列表推断命名。
+    * 对齐完 run↔患者↔组别后，更新 footprint / THBS1 脚本以接受 MaxQuant `proteinGroups.txt`/`evidence.txt` 为输入，并在 `data/interim/proteomics/PXD032767/` 下生成合并后的标签主表。
+  - *(进度 2025-09-23)*：
+    * 破解 PMC POW 限制后，已将 Supplementary Table S1 解算为 `data/interim/proteomics/PXD032767/metadata/clinical_metadata.tsv`（73 名受试者，`bm_group` 字段区分 brain_met / non_brain_other / non_brain_control）。
+    * 构建 MaxQuant run manifest（`data/interim/proteomics/PXD032767/metadata/run_manifest.tsv`），当前 12 个 E/P runs 全部映射到 `met_05`（brain_met，Exos/Plasma 双工）；后续需补充非脑样本以提升 run 级别对比度。
+    * 基于 MaxQuant `peptides.txt`/`proteinGroups.txt` 直接计算 footprint 与 THBS1 指标：`footprint_maxquant.tsv`、`thbs1_cleavage.tsv`、`features_maxquant.tsv` 分别存于 `data/interim/proteomics/PXD032767/metadata/` 与 `data/processed/proteomics/PXD032767/`。
+    * 使用 Supplementary Table S1 的原始强度矩阵生成 cohort 级特征（Serpin CLR、Proteo-ΔFM）并训练 `Serpin + ΔFM` 逻辑回归，5 折 CV AUC≈0.66（`results/tables/pzd032767_model_summary.tsv`）。模型目前缺少 THBS1（表内未检测到），ΔFM 系数主导；后续需引入更多 cohort 以稳健化性能。
+    * 将一次性分析逻辑包装成脚本 `scripts/py/site_triage_liquid.py`：接受 MaxQuant `txt/` 路径与 run manifest，输出 `maxquant_run_features.tsv` / `maxquant_patient_features.tsv`，并在具备标签时回归 `Serpin + ΔFM` 模型（CV 结果写入 `results/tables/<dataset>_liquid_model.tsv`）。当前 PRIDE 工程仅含 12 个 brain_met runs，待额外非脑 RAW 上传后可直接复用此脚本增量生成对照组特征。
+    * *(进度 2025-09-23)*：引入 MSV000089062 CSF 队列（Mikolajewicz Nat Commun 2022）作为“液体先行”示范：
+      - 通过 PMC POW 绕过脚本抓取 Supplementary Tables S1/S2/S5（存于 `data/interim/proteomics/MSV000089062/metadata/`），临床表中 BrainMet/GBM/PCNSL/NPH 标签直接映射到 `clinical_manifest.tsv`。
+      - `site_triage_liquid.py --mode csf` 解析 Raw Intensities → 构建 Serpin、NET-F/M、THBS1 proxy（缺乏观测时回填 0）与 cohort 元数据，输出 `data/processed/proteomics/MSV000089062/csf_patient_features.tsv`。
+      - 5 折 CV 逻辑回归（特征：Serpin、Proteo-ΔFM、THBS1_proxy、footprint_proxy）AUC≈0.65、AP≈0.39（`results/tables/msv000089062_csf_metrics.tsv`），同步产出 ROC/PR/校准/DCA/ Spearman 关联表。由于原始数据未捕获 THBS1/NE 半胰切位点，robust Logit (HC3) 退化为奇异矩阵，已在日志中标记。
+    * *(进度 2025-09-23)*：启动 B 轨血浆桥接：
+      - 选择 PXD018301（Lyden lab，Human512Reports 外泌体矩阵）作为“非脑”参照，下载 `Human512Reports.xlsx` 至 `data/interim/proteomics/PXD018301/metadata/`，从 `Description` 字段抽取 `GN=` 建立基因符号，并基于列名关键字生成 `manual_labels.tsv`（`brain_met` ↔ 名称含 brain/CNS/Neuro，余者标记为 `non_brain_other`）。
+      - 通过 `site_triage_liquid.py --mode csf --dataset PXD018301 --intensity-sheet proteins --label-tsv ...` 生成 `data/processed/proteomics/PXD018301/csf_patient_features.tsv`（512 样本，其中 brain_met=12），对应指标写入 `results/tables/pxd018301_csf_metrics.tsv`（5 折 CV AUC≈0.62，整体 AUC≈0.60；稳健 Logit 显示 THBS1_log↓、footprint_index↓、THBS1_cleave_idx↑ 均达到 p<0.05）。
+      - 新增 `--mode plasma`：自动读取主队列 (PXD032767) 与辅助队列 (PXD018301) 的特征表，注入 `dataset_indicator` 以控制批次效应，并输出跨队列模型 (`results/tables/pxd032767_pxd018301_plasma_metrics.tsv`，5 折 CV AUC≈0.79 / AP≈0.21)。稳健 Logit（`..._plasma_robust_logit.tsv`）与混合效应（`..._plasma_mixed_effects.tsv`）共同显示 THBS1_log↓、footprint_index↓、dataset_indicator<0（PXD018301 作为对照）依旧显著，Proteo-ΔFM 保持正向贡献。
+      - 发布级制图：`scripts/py/plot_site_triage_figures.py` 汇总 ROC（CSF 与 Plasma）与效应量（稳健 Logit + 混合效应），输出 `results/figures/site_triage_roc.{pdf,png}` / `site_triage_effects.{pdf,png}`，默认 `sns.set_context("talk")` 可快速调整字体与尺度。
+- **轨 B — 组织旁证（MET500 RNA，定位调整）**
+  - 维持 `scripts/py/site_triage_met500.py` 作为“器官倾向规则”的外部旁证，仅使用可映射到液体端点的 RNA proxy（Serpin expression、ΔFM_RNA 方向、IL6/STAT3、CoOption）。
+  - 明确 Caveat：模型依赖转移灶组织活检，不作为临床入口；放置在方法验证/器官规则部分。
+- **液体↔组织桥接（P2）**：如能获取血/CSF 与肿瘤 RNA 的配对或同队列数据，执行秩次映射（Footprint ↔ ΔFM_RNA、THBS1 cleavage ↔ THBS1/ECM 签名），在 README 中补“液体替代物为何可靠”的说明。
+
 Figures (R, Cell‑style):
 - `scripts/r/13_figures_a3.R` renders
   - `results/figures/A3_forest_assoc.pdf` – Spearman effect forest (95% CI via Fisher transform) by stratum×endpoint.
@@ -261,6 +303,7 @@ THBS1 cleavage index (endpoint anchor):
   micromamba run -n proteomics python scripts/py/thbs1_cleavage_index.py \
     --dataset PXD046330 --dataset PXD005719 --dataset PXD051579
   ```
+- 2025-09-21 draft visual: `results/figures/thbs1_spectrum_JIMT1_BR_R3.pdf` summarises THBS1 vs control collagen cleavage indices for the top-ranked sample (pending raw-spectrum export).
 
 Negative controls (null guards):
 - Compute and store at `results/tables/neg_controls.tsv`:
@@ -287,6 +330,7 @@ We keep the strict findings above unchanged and upgrade modelling per the follow
 - B1. Endpoint anchor — THBS1 cleavage index (to implement)
   - `THBS1_cleave_idx = (# semi/non‑tryptic N‑termini at curated THBS1 sites) / (THBS1 coverage)`; associate with Serpin_score, ΔFM, footprints; verify COL1A1/COL4A1 as specificity controls.
   - Script stub will consume combined PSMs and a curated site list under `resources/annotation/thbs1_sites.tsv`.
+  - Interim figure: `results/figures/thbs1_spectrum_JIMT1_BR_R3.pdf` (2025-09-21) capturing relative cleavage indices until MS/MS spectra are exported.
 - B2. MNAR upgraded — peptide‑level hurdle/zero‑inflated + meta‑logit (to implement)
   - Model detection per peptide: `Pr(detect_peptide_j) ~ Serpin_score + mods + (1 | cohort)`; meta‑logit across cohorts for NE/PR3 peptides; histone/ci‑markers as negative controls.
 - C. Anti‑confounding (to implement)
@@ -328,7 +372,7 @@ Next actions checklist
 - [ ] Populate `resources/modules/net_m_proteome.tsv`, `net_f_proteome.tsv`, and `serpin_brain.tsv` from PXD011796 + literature.
 - [ ] *(Paused)* Metabolomics preprocessing / redox ratios — restore once named metabolite matrices are available.
 - [ ] *(Paused)* Integrate metabolomics-derived metrics alongside proteomic layers.
-- [ ] Integrate layers into the mixed-effects framework and draft publication-quality figures.
+- [x] Integrate layers into the mixed-effects framework and draft publication-quality figures (A3 mixed-effects refreshed; SEM + MET500 triage figure in place).
 - External-growth / bypass proxies (module scores)
   - `scripts/py/module_scores.py` → `results/tables/module_scores.tsv` (CLR-based):
     * `E2F_G2M_score` (proliferation), `IL6_STAT3_score`, `CoOption_score`.

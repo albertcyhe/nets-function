@@ -21,20 +21,22 @@ NET‑F vs NET‑M（ΔFM）脑转移特异性失衡：从假设到推论（含�
 - ΔFM 配对差异（met−primary）：
   - GSE184869（RNA‑seq）：singscore Wilcoxon V=14, p=2.10e−4, FDR=3.22e−4，Cliff’s δ≈−0.70，n=20；ssGSEA 方向与显著性一致。
   - GSE125989（Affy）：V=91, p=0.252, FDR=0.298，Cliff’s δ≈0.25，n=16（不显著）。
-  - 图：results/figures/Figure2_GSE184869_Paired_DFM.pdf（含 GSE125989）。
+  - 图：results/figures/Figure2_GSE184869_Paired_DFM.pdf（含 GSE125989）。*（2025-09-21：重新跑脚本刷新。）*
+  - 表：results/tables/GSE184869_paired_tests.tsv、results/tables/GSE125989_paired_tests.tsv（Wilcoxon + Cliff’s δ）。
 - ΔFM 与 THBS1 偏相关（控制 Neutrophil + TumorPurity）：
   - GSE184869：singscore ρ=−0.3004, p=0.00415, FDR≈0.00831, n=90；ssGSEA ρ=−0.2732, p=0.00936, FDR≈0.00936，方向一致。
   - GSE125989：ρ=0.2269, p=0.2109, FDR≈0.3149, n=32（不显著）。
   - 图：results/figures/Figure3_GSE184869_THBS1_Residuals.pdf（残差散点，ΔFM 与 THBS1 均残差化后相关）。
+  - 表：results/tables/GSE184869_THBS1_residuals.tsv（Spearman ρ、p、n；偏相关备份保留在 `results/tables/GSE184869_thbs1_partial_cor.tsv`）。
 - F/M 相关性（Spearman）跨队列总览（5 队列 × 2 方法）：
   - GSE184869：singscore ρ=−0.2081, p=0.0491, FDR=0.098；ssGSEA ρ=−0.1216, p=0.2537。
   - GSE125989：ρ=0.4941, p=0.00449, FDR=0.01495；ssGSEA ρ=0.4025, p=0.02314。
   - GSE43837：ρ≈0.07–0.11，p>0.5；GSE14017：ρ≈0.23–0.26，p>0.18；GSE14018：ρ≈0.65–0.67，p≪0.001。
-  - 图：results/figures/Figure4_FM_Corr_Overview.pdf；数据：results/tables/fm_correlation_overview.tsv。
+  - 图：results/figures/Figure4_FM_Corr_Overview.pdf；数据：results/tables/fm_correlation_overview.tsv。*（2025-09-21：`scripts/r/06_fm_correlation_overview.R` 重新计算五队列。）*
 - scRNA（GSE186344，Colab 运行，严格门控，高 NEUT≥0.70 且低 TNK/Mono≤0.60；肿瘤like 上皮 q=0.60）：
   - 低ΔFM 中性粒亚群比例（样本层）：如 GSM5645901≈0.0188，GSM5645905≈0.0435；另两样本≈0。
   - THBS1 关联：当前覆盖 n≈4，THBS1 中位值跨样本变异度不足，相关系数未定义（constant input），已在 results/figures/Figure5_scRNA_THBS1_Assoc.txt 记录。
-  - 图：results/figures/Figure5_scRNA_LowDFM_Fraction.pdf；表：results/tables/gse186344_neutrophil_lowDFM_fraction.tsv 与 gse186344_subpop_thbs1_assoc.tsv。
+  - 图：results/figures/Figure5_scRNA_LowDFM_Fraction.pdf；表：results/tables/gse186344_neutrophil_lowDFM_fraction.tsv、results/tables/gse186344_sample_subpop_fraction.tsv 与 gse186344_subpop_thbs1_assoc.tsv；说明：THBS1 关联不足以估计（记录于 results/figures/Figure5_scRNA_THBS1_Assoc.txt）。
 
 反思（Reflection）
 - scRNA 的“负结果”并未否定 Bulk 的强证据；反而提示“低ΔFM”更可能是“细胞外、由 NETs 破裂后残留物定义”的稳态微环境信号（NET‑M 标记端成分相对 NET‑F 功能端更持久）。标准 scRNA 仅捕捉细胞内转录，无法直接记录这一“细胞外/非转录”的持久信号。
@@ -48,13 +50,13 @@ NET‑F vs NET‑M（ΔFM）脑转移特异性失衡：从假设到推论（含�
   - 多模态单细胞：CITE‑seq/空间蛋白捕捉“非转录”信号。
 
 图表生成与路径
-- 运行：`Rscript scripts/r/07_figures_story.R`
+- 运行：`Rscript scripts/r/07_figures_story.R`（2025-09-21 已在本地 `.venv`/micromamba 环境中重新执行一次）。
 - 输出：`results/figures/`
   - Figure1_DFM_Schematic.pdf：ΔFM 概念示意（ASCII 标签，避免字体编码问题）。
   - Figure2_GSE184869_Paired_DFM.pdf（含 GSE125989）：配对 ΔFM 连线。
   - Figure3_GSE184869_THBS1_Residuals.pdf：ΔFM 与 THBS1 偏相关（残差化）散点。
   - Figure4_FM_Corr_Overview.pdf：F/M 相关性总览热图。
-  - Figure5_scRNA_LowDFM_Fraction.pdf 与 Figure5_scRNA_THBS1_Assoc.txt：单细胞低ΔFM 亚群比例与 THBS1 关联结论。
+  - Figure5_scRNA_LowDFM_Fraction.pdf 与 Figure5_scRNA_THBS1_Assoc.txt：单细胞低ΔFM 亚群比例与 THBS1 关联结论（目前以现有样本占比填充）。
   - Figure6_Mechanism_Model.pdf：机制模型示意（NET‑M 残留 > NET‑F）。
 
 可复现（本地/Colab）
