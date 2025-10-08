@@ -3,6 +3,10 @@ Evidence Chain for NET Marker–Function Decoupling in Brain Metastasis (with re
 
 This README consolidates and reconstructs prior work across RNA and Proteomics/Metabolomics layers, following the flow “rationale → execution → results”, and preserves failures/adjustments for transparency.
 
+Acknowledgments
+- Inspired by Openmind Club.
+- Special thanks to Zhiping Yang for insightful discussions and encouragement.
+
 Quick Start
 - One‑click data retrieval: `bash scripts/sh/download_all_data.sh` (see `DATA_SOURCES.md` for coverage and notes)
 - One‑click environments: `bash scripts/sh/setup_proteomics_env.sh` and `bash scripts/sh/setup_scrna_env.sh` (see `ENVIRONMENT.md`)
@@ -221,11 +225,10 @@ Summary and next steps
   - Figures: [ΔFM concept schematic](results/figures/Figure1_DFM_Schematic.pdf), [Mechanism model](results/figures/Figure6_Mechanism_Model.pdf)
 
 - Controls and modules
-  - Tables: [negative controls](results/tables/neg_controls.tsv), [negative control associations](results/tables/neg_controls_assoc.tsv), [module scores](results/tables/module_scores.tsv), [module associations](results/tables/module_assoc.tsv), [bulk paired tests](results/tables/bulk_paired_tests.tsv), [bulk ΔFM scores](results/tables/)
+ - Tables: [negative controls](results/tables/neg_controls.tsv), [negative control associations](results/tables/neg_controls_assoc.tsv), [module scores](results/tables/module_scores.tsv), [module associations](results/tables/module_assoc.tsv), [bulk paired tests](results/tables/bulk_paired_tests.tsv), [bulk ΔFM scores](results/tables/)
 
 11. Next steps 
 - ISI (core/extended) + organ interaction; export forest plots.
 - Logit/zero‑inflation: F detection ~ Serpin (M as negative control); meta‑analysis across cohorts.
 - Substrate footprints and THBS1 cleavage: robust estimates and visualization against Serpin/Proteo‑ΔFM.
 - Liquid prototype page: integrate CSF/Plasma ROC and effect sizes; update brain vs non‑brain mechanism schematic.
-
