@@ -192,7 +192,7 @@ Summary and next steps
   - `python scripts/py/isi_model.py` → `results/tables/isi_per_sample.tsv`, `isi_models.tsv`
   - `python scripts/py/mnar_detection_model.py` → `results/tables/mnar_detection_table.tsv`, `mnar_logit_results.tsv`
 
-10. Figures and tables (outputs, browsable on GitHub)
+10. Figures and tables
 - Bulk results
   - Figures:
     - [Paired ΔFM: GSE184869](results/figures/Figure2_GSE184869_Paired_DFM.pdf) — paired difference (met − primary) showing brain‑specific decoupling.
@@ -223,12 +223,9 @@ Summary and next steps
 - Controls and modules
   - Tables: [negative controls](results/tables/neg_controls.tsv), [negative control associations](results/tables/neg_controls_assoc.tsv), [module scores](results/tables/module_scores.tsv), [module associations](results/tables/module_assoc.tsv), [bulk paired tests](results/tables/bulk_paired_tests.tsv), [bulk ΔFM scores](results/tables/)
 
-11. Next steps (two‑week minimal deliverables)
+11. Next steps 
 - ISI (core/extended) + organ interaction; export forest plots.
 - Logit/zero‑inflation: F detection ~ Serpin (M as negative control); meta‑analysis across cohorts.
 - Substrate footprints and THBS1 cleavage: robust estimates and visualization against Serpin/Proteo‑ΔFM.
 - Liquid prototype page: integrate CSF/Plasma ROC and effect sizes; update brain vs non‑brain mechanism schematic.
 
-—
-
-Note: This README covers all scripts, figures, tables, and failure notes from `README_proteo_metab.md`. The historical long document is kept for reference.

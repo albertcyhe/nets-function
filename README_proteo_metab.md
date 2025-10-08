@@ -182,11 +182,11 @@ Minimal, two-week deliverables (no wet lab)
 - One-page integrative schematic: Serpin↑ → F-missing↑ & Footprints↓ → THBS1 cleavage↓ → Proteo_ΔFM↓; M peptides stable; brain vs lung facets.
 
 Metabolomic extensions (B1 & B2) — *Paused*
-------------------------------------------
-> 2025-09-20：当前获取的 Workbench 研究（ST000745、ST001104、ST002921）仅提供 mwTab
-> 元信息和仪器 RAW，未公开命名代谢物的定量矩阵，GSH/GSSG 等红氧化比暂无法计算。
-> 相关工具（`scripts/py/metabolomics_preprocessing.py`, `scripts/py/mw_parser.py`）已归档，待
-> 未来获得包含命名代谢物表格的研究后再恢复此模块。
+-------------------------------------------
+> 2025-09-20: The currently retrieved Workbench studies (ST000745, ST001104, ST002921) provide mwTab metadata and instrument RAW only.
+> Named metabolite quantification tables are not public, so redox ratios (e.g., GSH/GSSG) cannot be computed at this time.
+> Related tools (`scripts/py/metabolomics_preprocessing.py`, `scripts/py/mw_parser.py`) are archived and will be restored
+> when studies with named metabolite tables become available.
 
 Cross-layer integration & modelling
 -----------------------------------
@@ -250,36 +250,36 @@ Mixed-effects (organ interaction):
   * `scripts/r/14_sem_model.R` (lavaan) → `results/models/sem_results.json`, `results/figures/A3_sem_path.svg`
     - Model: `Serpin_score_core -> F_latent -> {footprint, THBS1_cleave, Proteo-ΔFM}`; standardized paths saved, but warnings indicate limited identifiability (n≈24, some variances negative). Treat as conceptual preview pending additional data. *Re-run 2025-09-21 via `micromamba run -n proteomics Rscript scripts/r/14_sem_model.R`; lavaan flags non-invertible information matrix and negative variances as before.*
 
-#### Site triage 分层策略（液体主叙事 + 组织旁证）
-- **轨 A — 液体可落地（l-NFS 原型，2025-09-22 启动）**
-  - 数据源：优先挑选血浆/CSF 蛋白组带脑/非脑标签的公开资源（首选 PXD032767 血浆 sEV、MSV000089062 CSF）；必要时补充 PXD026016/健康 CSF 阴性参考。
-  - 特征：NE/PR3 footprint 指数 + THBS1 cleavage 指数 ± NET-M 模块（核小体/ci-H3）与 Serpin 模块；全部来源于液体质谱，不依赖组织活检。
-  - 模型：`P(brain) ~ z(footprint) + z(THBS1_cleave) (+ z(M_panel))`，5 折 CV 产出 AUC、Brier、校准曲线与 DCA；报告“每 100 人少做/多做 MRI/CT 的净获益”。
-  - 工程：新脚本 `scripts/py/site_triage_liquid.py`（复用 ROC/校准/DCA 绘图到 `results/figures/A4_site_triage_liquid_*.pdf`），输入由 `footprint_indices.py` 与 `thbs1_cleavage_index.py` 在液体矩阵上生成。
-  - *(进度 2025-09-22)*：已下载 PXD032767 MaxQuant `txt.zip` 并解压至 `data/interim/proteomics/PXD032767/txt/`，确认可用的 `proteinGroups.txt`/`evidence.txt`。脑转移/非脑标签不随 `txt.zip` 提供，需从 OncoImmunology 2022 补充材料抓取：
-    * 推荐直接下载 Supplementary Table S1 (`vdac161_suppl_supplementary_table_s1.xlsx`)：`https://pmc.ncbi.nlm.nih.gov/articles/instance/9639356/bin/vdac161_suppl_supplementary_table_s1.xlsx`。
-    * 若链接失效，可改用整包补充材料 `KONI_A_2067944_SM3909.zip`：`https://pmc.ncbi.nlm.nih.gov/articles/instance/9037466/bin/KONI_A_2067944_SM3909.zip`，解压后检索含受试者分组信息的表（通常为 Supplementary Table S1）。
-    * 将 Supplementary Table S1 中的 PatientID/Group (BM+/BM−/Healthy) 与 MaxQuant `evidence.txt` 的 `Raw file` 列按 E01/P01 命名规则映射；如补充材料未列 run 名，参照 PRIDE 文件列表推断命名。
-    * 对齐完 run↔患者↔组别后，更新 footprint / THBS1 脚本以接受 MaxQuant `proteinGroups.txt`/`evidence.txt` 为输入，并在 `data/interim/proteomics/PXD032767/` 下生成合并后的标签主表。
-  - *(进度 2025-09-23)*：
-    * 破解 PMC POW 限制后，已将 Supplementary Table S1 解算为 `data/interim/proteomics/PXD032767/metadata/clinical_metadata.tsv`（73 名受试者，`bm_group` 字段区分 brain_met / non_brain_other / non_brain_control）。
-    * 构建 MaxQuant run manifest（`data/interim/proteomics/PXD032767/metadata/run_manifest.tsv`），当前 12 个 E/P runs 全部映射到 `met_05`（brain_met，Exos/Plasma 双工）；后续需补充非脑样本以提升 run 级别对比度。
-    * 基于 MaxQuant `peptides.txt`/`proteinGroups.txt` 直接计算 footprint 与 THBS1 指标：`footprint_maxquant.tsv`、`thbs1_cleavage.tsv`、`features_maxquant.tsv` 分别存于 `data/interim/proteomics/PXD032767/metadata/` 与 `data/processed/proteomics/PXD032767/`。
-    * 使用 Supplementary Table S1 的原始强度矩阵生成 cohort 级特征（Serpin CLR、Proteo-ΔFM）并训练 `Serpin + ΔFM` 逻辑回归，5 折 CV AUC≈0.66（`results/tables/pzd032767_model_summary.tsv`）。模型目前缺少 THBS1（表内未检测到），ΔFM 系数主导；后续需引入更多 cohort 以稳健化性能。
-    * 将一次性分析逻辑包装成脚本 `scripts/py/site_triage_liquid.py`：接受 MaxQuant `txt/` 路径与 run manifest，输出 `maxquant_run_features.tsv` / `maxquant_patient_features.tsv`，并在具备标签时回归 `Serpin + ΔFM` 模型（CV 结果写入 `results/tables/<dataset>_liquid_model.tsv`）。当前 PRIDE 工程仅含 12 个 brain_met runs，待额外非脑 RAW 上传后可直接复用此脚本增量生成对照组特征。
-    * *(进度 2025-09-23)*：引入 MSV000089062 CSF 队列（Mikolajewicz Nat Commun 2022）作为“液体先行”示范：
-      - 通过 PMC POW 绕过脚本抓取 Supplementary Tables S1/S2/S5（存于 `data/interim/proteomics/MSV000089062/metadata/`），临床表中 BrainMet/GBM/PCNSL/NPH 标签直接映射到 `clinical_manifest.tsv`。
-      - `site_triage_liquid.py --mode csf` 解析 Raw Intensities → 构建 Serpin、NET-F/M、THBS1 proxy（缺乏观测时回填 0）与 cohort 元数据，输出 `data/processed/proteomics/MSV000089062/csf_patient_features.tsv`。
-      - 5 折 CV 逻辑回归（特征：Serpin、Proteo-ΔFM、THBS1_proxy、footprint_proxy）AUC≈0.65、AP≈0.39（`results/tables/msv000089062_csf_metrics.tsv`），同步产出 ROC/PR/校准/DCA/ Spearman 关联表。由于原始数据未捕获 THBS1/NE 半胰切位点，robust Logit (HC3) 退化为奇异矩阵，已在日志中标记。
-    * *(进度 2025-09-23)*：启动 B 轨血浆桥接：
-      - 选择 PXD018301（Lyden lab，Human512Reports 外泌体矩阵）作为“非脑”参照，下载 `Human512Reports.xlsx` 至 `data/interim/proteomics/PXD018301/metadata/`，从 `Description` 字段抽取 `GN=` 建立基因符号，并基于列名关键字生成 `manual_labels.tsv`（`brain_met` ↔ 名称含 brain/CNS/Neuro，余者标记为 `non_brain_other`）。
-      - 通过 `site_triage_liquid.py --mode csf --dataset PXD018301 --intensity-sheet proteins --label-tsv ...` 生成 `data/processed/proteomics/PXD018301/csf_patient_features.tsv`（512 样本，其中 brain_met=12），对应指标写入 `results/tables/pxd018301_csf_metrics.tsv`（5 折 CV AUC≈0.62，整体 AUC≈0.60；稳健 Logit 显示 THBS1_log↓、footprint_index↓、THBS1_cleave_idx↑ 均达到 p<0.05）。
-      - 新增 `--mode plasma`：自动读取主队列 (PXD032767) 与辅助队列 (PXD018301) 的特征表，注入 `dataset_indicator` 以控制批次效应，并输出跨队列模型 (`results/tables/pxd032767_pxd018301_plasma_metrics.tsv`，5 折 CV AUC≈0.79 / AP≈0.21)。稳健 Logit（`..._plasma_robust_logit.tsv`）与混合效应（`..._plasma_mixed_effects.tsv`）共同显示 THBS1_log↓、footprint_index↓、dataset_indicator<0（PXD018301 作为对照）依旧显著，Proteo-ΔFM 保持正向贡献。
-      - 发布级制图：`scripts/py/plot_site_triage_figures.py` 汇总 ROC（CSF 与 Plasma）与效应量（稳健 Logit + 混合效应），输出 `results/figures/site_triage_roc.{pdf,png}` / `site_triage_effects.{pdf,png}`，默认 `sns.set_context("talk")` 可快速调整字体与尺度。
-- **轨 B — 组织旁证（MET500 RNA，定位调整）**
-  - 维持 `scripts/py/site_triage_met500.py` 作为“器官倾向规则”的外部旁证，仅使用可映射到液体端点的 RNA proxy（Serpin expression、ΔFM_RNA 方向、IL6/STAT3、CoOption）。
-  - 明确 Caveat：模型依赖转移灶组织活检，不作为临床入口；放置在方法验证/器官规则部分。
-- **液体↔组织桥接（P2）**：如能获取血/CSF 与肿瘤 RNA 的配对或同队列数据，执行秩次映射（Footprint ↔ ΔFM_RNA、THBS1 cleavage ↔ THBS1/ECM 签名），在 README 中补“液体替代物为何可靠”的说明。
+#### Site triage stratification strategy (liquid-first narrative + tissue corroboration)
+- **Track A — Liquid-deployable (l-NFS prototype, launched 2025-09-22)**
+  - Data sources: prioritize public plasma/CSF proteomics with brain/non-brain labels (prefer PXD032767 plasma sEV, MSV000089062 CSF); supplement with PXD026016/healthy CSF negatives if needed.
+  - Features: NE/PR3 footprint index + THBS1 cleavage index ± NET-M module (nucleosome/ci-H3) and Serpin module; all derived from liquid MS, no tissue biopsy required.
+  - Model: `P(brain) ~ z(footprint) + z(THBS1_cleave) (+ z(M_panel))`, 5-fold CV outputs AUC, Brier, calibration, and DCA; report net benefit (“fewer/more MRI/CT per 100 patients”).
+  - Engineering: new script `scripts/py/site_triage_liquid.py` (reuses ROC/calibration/DCA plotting to `results/figures/A4_site_triage_liquid_*.pdf`); inputs produced by `footprint_indices.py` and `thbs1_cleavage_index.py` on liquid matrices.
+  - *(Progress 2025-09-22)*: downloaded PXD032767 MaxQuant `txt.zip` and extracted to `data/interim/proteomics/PXD032767/txt/`; confirmed usable `proteinGroups.txt`/`evidence.txt`. Brain/non-brain labels are not included in `txt.zip` and must be pulled from OncoImmunology 2022 supplementary materials:
+    * Recommended: download Supplementary Table S1 (`vdac161_suppl_supplementary_table_s1.xlsx`): `https://pmc.ncbi.nlm.nih.gov/articles/instance/9639356/bin/vdac161_suppl_supplementary_table_s1.xlsx`.
+    * If the link breaks, use the full supplement `KONI_A_2067944_SM3909.zip`: `https://pmc.ncbi.nlm.nih.gov/articles/instance/9037466/bin/KONI_A_2067944_SM3909.zip`, then locate the subject grouping table (typically Supplementary Table S1).
+    * Map PatientID/Group (BM+/BM−/Healthy) from Supplementary Table S1 to the MaxQuant `evidence.txt` `Raw file` column under the E01/P01 naming rules; if run names are absent, infer from PRIDE file listings.
+    * After aligning run↔patient↔group, update the footprint/THBS1 scripts to accept MaxQuant `proteinGroups.txt`/`evidence.txt` and generate a merged label master under `data/interim/proteomics/PXD032767/`.
+  - *(Progress 2025-09-23)*:
+    * After working around PMC POW constraints, parsed Supplementary Table S1 into `data/interim/proteomics/PXD032767/metadata/clinical_metadata.tsv` (73 subjects; `bm_group` splits brain_met / non_brain_other / non_brain_control).
+    * Built the MaxQuant run manifest (`data/interim/proteomics/PXD032767/metadata/run_manifest.tsv`); currently 12 E/P runs all map to `met_05` (brain_met; Exos/Plasma); add non-brain samples to improve run-level contrast.
+    * Computed footprint and THBS1 indices directly from `peptides.txt`/`proteinGroups.txt`: `footprint_maxquant.tsv`, `thbs1_cleavage.tsv`, `features_maxquant.tsv` saved under `data/interim/proteomics/PXD032767/metadata/` and `data/processed/proteomics/PXD032767/`.
+    * Generated cohort-level features (Serpin CLR, Proteo-ΔFM) from the raw intensity matrix in Supplementary Table S1 and trained a `Serpin + ΔFM` logistic regression; 5-fold CV AUC ≈ 0.66 (`results/tables/pzd032767_model_summary.tsv`). THBS1 is missing (not detected in the table), so ΔFM dominates; add cohorts for stability.
+    * Wrapped the one-off analysis into `scripts/py/site_triage_liquid.py`: accept the MaxQuant `txt/` path and run manifest; output `maxquant_run_features.tsv` / `maxquant_patient_features.tsv`; when labels exist, fit `Serpin + ΔFM` (CV → `results/tables/<dataset>_liquid_model.tsv`). Current PRIDE project has only 12 brain_met runs; once additional non-brain RAW are available, reuse the script to generate controls incrementally.
+    * *(Progress 2025-09-23)*: introduced the MSV000089062 CSF cohort (Mikolajewicz Nat Commun 2022) as a “liquid-first” demo:
+      - Used PMC POW to retrieve Supplementary Tables S1/S2/S5 (`data/interim/proteomics/MSV000089062/metadata/`); mapped BrainMet/GBM/PCNSL/NPH labels to `clinical_manifest.tsv`.
+      - `site_triage_liquid.py --mode csf` parses Raw Intensities → builds Serpin, NET-F/M, THBS1 proxies (fill 0 when unobserved) with cohort metadata, outputs `data/processed/proteomics/MSV000089062/csf_patient_features.tsv`.
+      - 5-fold CV logistic regression (features: Serpin, Proteo-ΔFM, THBS1_proxy, footprint_proxy) AUC ≈ 0.65, AP ≈ 0.39 (`results/tables/msv000089062_csf_metrics.tsv`); also outputs ROC/PR/calibration/DCA/Spearman tables. Due to absent THBS1/NE semi-tryptic cleavage sites, robust Logit (HC3) degenerates to a singular matrix; noted in logs.
+    * *(Progress 2025-09-23)*: started Track B plasma bridging:
+      - Chose PXD018301 (Lyden lab, Human512Reports EV matrix) as the “non-brain” reference; download `Human512Reports.xlsx` to `data/interim/proteomics/PXD018301/metadata/`; extract `GN=` from `Description` to build gene symbols; create `manual_labels.tsv` based on column keywords (`brain_met` if name contains brain/CNS/Neuro; else `non_brain_other`).
+      - Via `site_triage_liquid.py --mode csf --dataset PXD018301 --intensity-sheet proteins --label-tsv ...` generated `data/processed/proteomics/PXD018301/csf_patient_features.tsv` (512 samples; brain_met=12); metrics at `results/tables/pxd018301_csf_metrics.tsv` (5-fold CV AUC ≈ 0.62; overall AUC ≈ 0.60). Robust logit shows THBS1_log↓, footprint_index↓, THBS1_cleave_idx↑ (all p<0.05).
+      - Added `--mode plasma`: read main (PXD032767) and auxiliary (PXD018301) feature tables; inject `dataset_indicator` to control batch effects; output cross-cohort model (`results/tables/pxd032767_pxd018301_plasma_metrics.tsv`; 5-fold CV AUC ≈ 0.79 / AP ≈ 0.21). Robust logit (`..._plasma_robust_logit.tsv`) and mixed effects (`..._plasma_mixed_effects.tsv`) both show THBS1_log↓, footprint_index↓, dataset_indicator<0 (PXD018301 as reference) remain significant; Proteo-ΔFM contributes positively.
+      - Publication-ready plotting: `scripts/py/plot_site_triage_figures.py` aggregates ROC (CSF and Plasma) and effects (robust logit + mixed effects) to `results/figures/site_triage_roc.{pdf,png}` / `site_triage_effects.{pdf,png}`; default `sns.set_context("talk")` for quick typography/scale tuning.
+- **Track B — Tissue corroboration (MET500 RNA, positioning adjustment)**
+  - Maintain `scripts/py/site_triage_met500.py` as external corroboration for “organ preference rules”, using only RNA proxies that map to liquid endpoints (Serpin expression, ΔFM_RNA direction, IL6/STAT3, CoOption).
+  - Explicit caveat: this model depends on metastatic tissue biopsies and is not a clinical entry point; keep it under methods validation/organ rules.
+- **Liquid↔Tissue bridging (P2)**: If paired blood/CSF and tumor RNA (or same-cohort data) are available, perform rank-mapping (Footprint ↔ ΔFM_RNA, THBS1 cleavage ↔ THBS1/ECM signatures) and add rationale in the README on why liquid surrogates are reliable.
 
 Figures (R, Cell‑style):
 - `scripts/r/13_figures_a3.R` renders
